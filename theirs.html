@@ -10,32 +10,30 @@
     <script type="text/javascript"
             src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <script type="text/javascript" src="scripts/swfobject.js"></script>
+    <script type="text/javascript" src="scripts/twitchplayer.js"></script>
     <script type="text/javascript" src="scripts/stream.js"></script>
     <title>HCB Stream Window</title>
 </head>
 <body>
 
-<div id="videocontainer">
-    <object type="application/x-shockwave-flash"
-            width="100%" height="100%" id="twitchPlayer"
-            data="http://www.justin.tv/widgets/live_api_player.swf">
-        <param name="menu" value="false">
-        <param name="allowFullScreen" value="true">
-        <param name="allowscriptaccess" value="always">
-        <param name="wmode" value="transparent">
-        <param name="movie"
-               value="http://www.justin.tv/widgets/live_api_player.swf">
-        <param name="flashvars"
-               value="enable_javascript=true&amp;javascript_callback_path=twitchPlayer.twitchCallback&amp;consumer_key=54VEwlMeAQHLgYk1wMbcTw">
-    </object>
-    <!--<object type="application/x-shockwave-flash"-->
-            <!--data="http://cdn.livestream.com/chromelessPlayer/v20/playerapi.swf"-->
-            <!--width="100%" height="100%" id="livestreamPlayer"-->
-            <!--style="visibility: hidden;">-->
-        <!--<param name="AllowScriptAccess" value="always">-->
-        <!--<param name="allowFullScreen" value="true">-->
-        <!--<param name="flashvars" value="channel=hardcore_bro">-->
-    <!--</object>-->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#twitch-player").TwitchPlayer({  //jQuery Selectors
+            channel: "Destructoid", //change on your own CHANNEL NAME FROM TWITCH.TV/JUSTIN.TV
+            width: 500, //set width in px for your player
+            height: null, //optional, if you dont set it, script use 16:9 proportions from width
+            apikey: "54VEwlMeAQHLgYk1wMbcTw", //YOU MUST HAVE OWN API KEY
+            quality: "live", //"live" - the best quality, you can use "360p", "480p" etc. if available for your stream
+            background: "#000000", //background color for your player, default black
+            autostart: true, //set false if you dont need autostart
+            volume: 50, //starting volume min 1, max 100
+            images: "twitchplayer/images/", //src to images
+            playbtn: "twitchplayer/images/play.png" //src to play button - only for autostart: false
+        });
+    });
+</script>
+
+<div id="twitch-player">
 </div>
 
 <div id="streambar">
