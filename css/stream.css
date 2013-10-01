@@ -4,7 +4,7 @@ html, body {
 	margin: 0;
 }
 
-#videocontainer {
+#video-container {
 	position: fixed;
 	top: 0;
 	bottom: 30px;
@@ -12,7 +12,12 @@ html, body {
 	background-color: #000000;
 }
 
-#streambar {
+#twitch-player {
+    position: relative;
+    bottom: 0;
+}
+
+#stream-bar {
 	position: fixed;
 	bottom: 0;
 	height: 30px;

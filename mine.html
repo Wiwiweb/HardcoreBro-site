@@ -15,16 +15,17 @@
 </head>
 <body>
 
-<div id="videocontainer">
+<div id="video-container">
     <object type="application/x-shockwave-flash"
-            width="100%" height="100%" id="twitchPlayer"
-            data="http://www.justin.tv/widgets/live_api_player.swf">
-        <param name="menu" value="false">
-        <param name="align" value="r">
-        <param name="salign" value="tr">
+            width="100%" height="100%" id="twitch-player"
+            data="http://www.justin.tv/widgets/live_api_player.swf"
+            bgcolor="#000000">
+        <!--<param name="menu" value="false">-->
+        <!--<param name="align" value="r">-->
+        <!--<param name="salign" value="bl">-->
+        <!--<param name="wmode" value="transparent">-->
         <param name="allowFullScreen" value="true">
         <param name="allowscriptaccess" value="always">
-        <param name="wmode" value="transparent">
         <param name="movie"
                value="http://www.justin.tv/widgets/live_api_player.swf">
         <param name="flashvars"
@@ -32,7 +33,7 @@
     </object>
 </div>
 
-<div id="streambar">
+<div id="stream-bar">
     <div id="play-pause" class="button">
         <img id="play-button-image" src="images/play.png" alt="Play"/>
     </div>
