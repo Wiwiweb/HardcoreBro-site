@@ -1,5 +1,21 @@
 var twitchChannel = 'Destructoid';
 var twitchQuality = 'live';
+var livestreamChannel = 'hardcore_bro';
+var defaultVolume = 50;
+
+var checkTwitchLoadedInterval;
+
+var $twitchPlayer;
+var $lsPlayer;
+var $playPauseButton;
+var $playPauseImage;
+var $volumeSlider;
+var $volumeSliderImage;
+var $titleText;
+var $playerDropdown;
+
+//var currentPlayer = 'twitch';
+var currentPlayer = 'livestream';
 
 jQuery.fn.center = function () {
     this.width(Math.min(this.height() * (4 / 3), this.parent().width()) + "px");
@@ -11,87 +27,168 @@ $(document).ready(function () {
     console.info('ready');
     console.info(document.domain);
 
-    var $playPauseButton = $('#play-pause');
-    var $playPauseImage = $('#play-button-image');
-    var $volumeSlider = $("#volume-slider");
-    $volumeSlider.slider({ range: "min" });
-    var $volumeSliderImage = $('#volume-button-image');
+    $playPauseButton = $('#play-pause');
+    $playPauseImage = $('#play-button-image');
+    $volumeSlider = $("#volume-slider");
+    $volumeSliderImage = $('#volume-button-image');
+    $titleText = $('#title-text');
+    $playerDropdown = $('#player-dropdown');
 
+    $volumeSlider.slider({
+        range: "min",
+        value: defaultVolume,
+        animate: 100,
+        slide: changeVolume
+    });
+    $playerDropdown.change(function () {
+        changePlayer($playerDropdown[0].value)
+    });
 
-    var $twitchPlayer = $("#twitch-player");
-    console.log($twitchPlayer[0]);
-    var checkTwitchLoadedInterval = setInterval(checkTwitchLoaded, 50);
+    $twitchPlayer = $("#twitch-player");
+    console.log($twitchPlayer);
+//  checkTwitchLoadedInterval = setInterval(checkTwitchLoaded, 50);
 
-    function checkTwitchLoaded() {
-        console.log('twitch PercentLoaded: ' + $twitchPlayer[0].PercentLoaded());
-        if ($twitchPlayer[0].PercentLoaded() == 100) {
-            twitchInit();
-            clearInterval(checkTwitchLoadedInterval);
-        }
-    }
+    $lsPlayer = $("#livestream-player");
+    console.log($lsPlayer);
 
-    function twitchInit() {
-        console.info("twitchInit");
-        console.info($twitchPlayer);
-        $twitchPlayer.center();
-        play();
-        $volumeSlider.on('slide', changeVolume);
-    }
-
-    $twitchPlayer[0].twitchCallback = function (e, info) {
-        console.info("twitchCallback = " + e);
-        if (e == 'stream_viewer_count') {
-            console.info('stream_viewer_count')
-        }
-        if (e == 'connected') {
-            console.info('connected')
-        }
-        if (e == 'broadcast_finished' || e == 'stream_lost') {
-            console.info('broadcast_finished')
-        }
-    };
-
-    function play() {
-        console.log('play');
-        $twitchPlayer[0].play_live(twitchChannel, twitchQuality);
-        $playPauseImage.attr('src', 'images/pause.png');
-        $playPauseButton.off('click').on('click', pause);
-    }
-
-    function pause() {
-        console.log('pause');
-        $twitchPlayer[0].pause_video();
-        $playPauseImage.attr('src', 'images/play.png');
-        $playPauseButton.off('click').on('click', play);
-    }
-
-    function changeVolume(event, ui) {
-        var volume = ui.value;
-        console.log('changeVolume: ' + volume);
-        $twitchPlayer[0].change_volume(volume);
-        if (volume > 80) {
-            $volumeSliderImage.attr('src', 'images/volume_high.png')
-        } else if (volume > 40) {
-            $volumeSliderImage.attr('src', 'images/volume_mid.png')
-        } else if (volume > 0) {
-            $volumeSliderImage.attr('src', 'images/volume_low.png')
-        } else {
-            $volumeSliderImage.attr('src', 'images/volume_mute.png')
-        }
-    }
-
-//    $('#play-pause').click(function () {
-//        console.info('play-pause');
-//        $twitchPlayer.resume_video();
-//    });
-//
-//    $('#volume').click(function () {
-//        console.info('volume');
-//        $twitchPlayer.mute();
-//    });
-//
     $(window).resize(function () {
         $twitchPlayer.center()
     });
 
+    setInterval(updateTitle, 60000);
 });
+
+function checkTwitchLoaded() {
+    console.log('twitch PercentLoaded: ' + $twitchPlayer[0].PercentLoaded());
+    if ($twitchPlayer[0].PercentLoaded() == 100) {
+        twitchInit();
+        clearInterval(checkTwitchLoadedInterval);
+    }
+}
+
+function twitchInit() {
+    console.info("twitchInit");
+    $twitchPlayer.center();
+    play();
+    updateTitle();
+    $twitchPlayer[0].change_volume(defaultVolume)
+}
+
+function twitchCallback(e, info) {
+    console.info("twitchCallback: " + e);
+    if (e == 'stream_viewer_count') {
+        console.info('stream_viewer_count')
+    }
+    if (e == 'connected') {
+        console.info('connected')
+    }
+    if (e == 'broadcast_finished' || e == 'stream_lost') {
+        console.info('broadcast_finished')
+    }
+}
+
+function livestreamInit() {
+    console.info("livestreamInit");
+    $lsPlayer[0].load(livestreamChannel);
+    $lsPlayer[0].showPlayButton(false);
+    $lsPlayer[0].showPauseButton(false);
+    $lsPlayer[0].showMuteButton(false);
+    $lsPlayer[0].showFullscreenButton(true);
+    $lsPlayer[0].showThumbnail(true);
+    play();
+    updateTitle();
+    $lsPlayer[0].setVolume(defaultVolume / 100);
+}
+
+function livestreamCallback(e) {
+    console.info("livestreamCallback: " + e);
+    if (e == 'ready') {
+        livestreamInit()
+    } else if (e == 'connectionEvent') {
+        setTimeout(updateTitle, 500)
+    }
+}
+
+function play() {
+    console.log('play');
+    if (currentPlayer == 'twitch') {
+        $twitchPlayer[0].play_live(twitchChannel, twitchQuality)
+    } else {
+        $lsPlayer[0].startPlayback()
+    }
+    $playPauseImage.attr('src', 'images/pause.png');
+    $playPauseButton.off('click').on('click', pause);
+}
+
+function pause() {
+    console.log('pause');
+    if (currentPlayer == 'twitch') {
+        $twitchPlayer[0].pause_video()
+    } else {
+        $lsPlayer[0].stopPlayback()
+    }
+    $playPauseImage.attr('src', 'images/play.png');
+    $playPauseButton.off('click').on('click', play);
+}
+
+function changeVolume(event, ui) {
+    var volume = ui.value;
+    console.log('changeVolume: ' + volume);
+    if (currentPlayer == 'twitch') {
+        $twitchPlayer[0].change_volume(volume)
+    } else {
+        $lsPlayer[0].setVolume(volume / 100)
+    }
+    if (volume > 80) {
+        $volumeSliderImage.attr('src', 'images/volume_high.png')
+    } else if (volume > 40) {
+        $volumeSliderImage.attr('src', 'images/volume_mid.png')
+    } else if (volume > 0) {
+        $volumeSliderImage.attr('src', 'images/volume_low.png')
+    } else {
+        $volumeSliderImage.attr('src', 'images/volume_mute.png')
+    }
+}
+
+function updateTitle() {
+    if (currentPlayer == 'twitch') {
+        $.getJSON('https://api.twitch.tv/kraken/streams/' + twitchChannel +
+            '?callback=?', function (data) {
+            var text;
+            if (data.stream) { // Twitch is live
+                text = data.stream.channel.status;
+            } else {
+                text = "Channel offline.";
+            }
+            console.log('updateTitle: ' + text);
+            $titleText.text(text);
+        });
+    } else {
+        var text = $lsPlayer[0].getCurrentContentTitle();
+        if (text == null) {
+            text = "Loading..."
+        }
+        console.log('updateTitle: ' + text);
+        $titleText.text(text);
+    }
+
+}
+
+function changePlayer(player) {
+    console.log("changePlayer: " + player);
+    if (player != currentPlayer) {
+        currentPlayer = player;
+        clearInterval(checkTwitchLoadedInterval);
+        switch (player) {
+            case 'twitch':
+                $lsPlayer.hide();
+                $twitchPlayer.show();
+                checkTwitchLoadedInterval = setInterval(checkTwitchLoaded, 50);
+                break;
+            case 'livestream':
+                $twitchPlayer.hide();
+                $lsPlayer.show();
+                break;
+        }
+    }
+}
