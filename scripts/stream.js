@@ -1,4 +1,5 @@
-var twitchChannel = 'Destructoid';
+var twitchMainChannel = 'Destructoid';
+var twitchSecondaryChannel = 'MANvsGAME';
 var twitchQuality = 'live';
 var livestreamChannel = 'hardcore_bro';
 var defaultVolume = 50;
@@ -16,6 +17,7 @@ var $playerDropdown;
 
 //var currentPlayer = 'twitch';
 var currentPlayer = 'livestream';
+var currentTwitchChannel = twitchMainChannel;
 
 jQuery.fn.center = function () {
     this.width(Math.min(this.height() * (4 / 3), this.parent().width()) + "px");
@@ -41,21 +43,23 @@ $(document).ready(function () {
         slide: changeVolume
     });
     $playerDropdown.change(function () {
-        changePlayer($playerDropdown[0].value)
+        channelDropdown($playerDropdown[0].value)
     });
 
     $twitchPlayer = $("#twitch-player");
     console.log($twitchPlayer);
-//  checkTwitchLoadedInterval = setInterval(checkTwitchLoaded, 50);
+    if (currentPlayer == 'twitch') {
+        checkTwitchLoadedInterval = setInterval(checkTwitchLoaded, 50);
+    }
 
     $lsPlayer = $("#livestream-player");
     console.log($lsPlayer);
 
+    setInterval(updateTitle, 60000);
+
     $(window).resize(function () {
         $twitchPlayer.center()
     });
-
-    setInterval(updateTitle, 60000);
 });
 
 function checkTwitchLoaded() {
@@ -105,16 +109,18 @@ function livestreamCallback(e) {
     if (e == 'ready') {
         livestreamInit()
     } else if (e == 'connectionEvent') {
-        setTimeout(updateTitle, 500)
+        setTimeout(updateTitle, 1000)
+    } else if (e == 'playbackEvent') {
+        updateTitle()
     }
 }
 
 function play() {
     console.log('play');
     if (currentPlayer == 'twitch') {
-        $twitchPlayer[0].play_live(twitchChannel, twitchQuality)
+        $twitchPlayer[0].play_live(currentTwitchChannel, twitchQuality)
     } else {
-        $lsPlayer[0].startPlayback()
+        $lsPlayer[0].startPlayback();
     }
     $playPauseImage.attr('src', 'images/pause.png');
     $playPauseButton.off('click').on('click', pause);
@@ -152,7 +158,7 @@ function changeVolume(event, ui) {
 
 function updateTitle() {
     if (currentPlayer == 'twitch') {
-        $.getJSON('https://api.twitch.tv/kraken/streams/' + twitchChannel +
+        $.getJSON('https://api.twitch.tv/kraken/streams/' + currentTwitchChannel +
             '?callback=?', function (data) {
             var text;
             if (data.stream) { // Twitch is live
@@ -165,13 +171,38 @@ function updateTitle() {
         });
     } else {
         var text = $lsPlayer[0].getCurrentContentTitle();
-        if (text == null) {
-            text = "Loading..."
+        if (text != null) {
+            $titleText.text(text);
         }
         console.log('updateTitle: ' + text);
-        $titleText.text(text);
     }
+}
 
+function channelDropdown(choice) {
+    console.log("channelDropdown: " + choice);
+    switch (choice) {
+        case 'twitch1':
+            currentTwitchChannel = twitchMainChannel;
+            if (currentPlayer == 'twitch') {
+                play();
+                updateTitle();
+            } else {
+                changePlayer('twitch')
+            }
+            break;
+        case 'twitch2':
+            currentTwitchChannel = twitchSecondaryChannel;
+            if (currentPlayer == 'twitch') {
+                play();
+                updateTitle();
+            } else {
+                changePlayer('twitch')
+            }
+            break;
+        case 'livestream':
+            changePlayer('livestream');
+            break;
+    }
 }
 
 function changePlayer(player) {
