@@ -13,7 +13,7 @@ var $playPauseImage;
 var $volumeSlider;
 var $volumeSliderImage;
 var $titleText;
-var $playerDropdown;
+var $channelDropdown;
 
 //var currentPlayer = 'twitch';
 var currentPlayer = 'livestream';
@@ -34,7 +34,7 @@ $(document).ready(function () {
     $volumeSlider = $("#volume-slider");
     $volumeSliderImage = $('#volume-button-image');
     $titleText = $('#title-text');
-    $playerDropdown = $('#player-dropdown');
+    $channelDropdown = $('#channel-dropdown');
 
     $volumeSlider.slider({
         range: "min",
@@ -42,8 +42,8 @@ $(document).ready(function () {
         animate: 100,
         slide: changeVolume
     });
-    $playerDropdown.change(function () {
-        channelDropdown($playerDropdown[0].value)
+    $channelDropdown.change(function () {
+        channelDropdown($channelDropdown[0].value)
     });
 
     $twitchPlayer = $("#twitch-player");
