@@ -44,18 +44,22 @@
         <img id="play-button-image" src="images/play.png" alt="Play"/>
     </div>
     <div id="volume" class="button">
-        <img id="volume-button-image" src="images/volume_high.png"
-             alt="Volume"/>
-
+        <div id="mute">
+            <img id="volume-button-image" src="images/volume_high.png"
+                 alt="Volume"/>
+        </div>
         <div id="volume-slider"></div>
+    </div>
+    <div id="viewer-count">
+        ? Bros
     </div>
     <div id="title-text">Loading...</div>
     <div id="right-side">
         <select id="channel-dropdown">
-            <!--<option value="auto">Autoswitch</option>-->
+            <option value="auto" selected="selected">Autoswitch</option>
             <option value="twitch1">Main Channel</option>
             <option value="twitch2">Movie Channel</option>
-            <option value="livestream" selected="selected">Livestream (Autoplay)</option>
+            <option value="livestream">Livestream (Autoplay)</option>
         </select>
     </div>
 </div>

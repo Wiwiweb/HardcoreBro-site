@@ -4,7 +4,10 @@ var twitchQuality = 'live';
 var livestreamChannel = 'hardcore_bro';
 var defaultVolume = 50;
 
+var rememberedVolume = 50;
+
 var checkTwitchLoadedInterval;
+var autoUpdateViewerCountInterval;
 
 var $twitchPlayer;
 var $lsPlayer;
@@ -12,6 +15,8 @@ var $playPauseButton;
 var $playPauseImage;
 var $volumeSlider;
 var $volumeSliderImage;
+var $muteButton;
+var $viewerCount;
 var $titleText;
 var $channelDropdown;
 
@@ -32,7 +37,9 @@ $(document).ready(function () {
     $playPauseButton = $('#play-pause');
     $playPauseImage = $('#play-button-image');
     $volumeSlider = $("#volume-slider");
+    $muteButton = $("#mute");
     $volumeSliderImage = $('#volume-button-image');
+    $viewerCount = $('#viewer-count');
     $titleText = $('#title-text');
     $channelDropdown = $('#channel-dropdown');
 
@@ -40,8 +47,9 @@ $(document).ready(function () {
         range: "min",
         value: defaultVolume,
         animate: 100,
-        slide: changeVolume
+        slide: volumeSlider
     });
+    $muteButton.click(mute);
     $channelDropdown.change(function () {
         channelDropdown($channelDropdown[0].value)
     });
@@ -55,7 +63,7 @@ $(document).ready(function () {
     $lsPlayer = $("#livestream-player");
     console.log($lsPlayer);
 
-    setInterval(updateTitle, 60000);
+    setInterval(updateTitle, 10000);
 
     $(window).resize(function () {
         $twitchPlayer.center()
@@ -89,6 +97,9 @@ function twitchCallback(e, info) {
     if (e == 'broadcast_finished' || e == 'stream_lost') {
         console.info('broadcast_finished')
     }
+    if (e == 'stream_viewer_count') {
+        updateViewerCount(info.stream.toString())
+    }
 }
 
 function livestreamInit() {
@@ -102,6 +113,10 @@ function livestreamInit() {
     play();
     updateTitle();
     $lsPlayer[0].setVolume(defaultVolume / 100);
+    updateViewerCount($lsPlayer[0].getViewerCount());
+    autoUpdateViewerCountInterval = setInterval(function () {
+        updateViewerCount($lsPlayer[0].getViewerCount())
+    }, 5000);
 }
 
 function livestreamCallback(e) {
@@ -137,8 +152,12 @@ function pause() {
     $playPauseButton.off('click').on('click', play);
 }
 
-function changeVolume(event, ui) {
-    var volume = ui.value;
+function volumeSlider(event, ui) {
+    rememberedVolume = ui.value;
+    changeVolume(ui.value);
+}
+
+function changeVolume(volume) {
     console.log('changeVolume: ' + volume);
     if (currentPlayer == 'twitch') {
         $twitchPlayer[0].change_volume(volume)
@@ -154,6 +173,21 @@ function changeVolume(event, ui) {
     } else {
         $volumeSliderImage.attr('src', 'images/volume_mute.png')
     }
+}
+
+function mute() {
+    console.log('mute');
+    var volume;
+    if ($volumeSlider.slider('value') == 0) {
+        if (rememberedVolume == 0) {
+            rememberedVolume = defaultVolume;
+        }
+        volume = rememberedVolume;
+    } else {
+        volume = 0
+    }
+    changeVolume(volume);
+    $volumeSlider.slider('value', volume);
 }
 
 function updateTitle() {
@@ -176,6 +210,21 @@ function updateTitle() {
         }
         console.log('updateTitle: ' + text);
     }
+}
+
+function updateViewerCount(viewers) {
+    console.log('updateViewerCount: ' + viewers);
+    var postText;
+    if (viewers == 1) {
+        postText = "Bro"
+    } else if (viewers <= 50) {
+        postText = "Bros"
+    } else if (viewers <= 100) {
+        postText = "Bros!"
+    } else {
+        postText = "Bros!!"
+    }
+    $viewerCount.text(viewers + ' ' + postText);
 }
 
 function channelDropdown(choice) {
@@ -215,6 +264,7 @@ function changePlayer(player) {
                 $lsPlayer.hide();
                 $twitchPlayer.show();
                 checkTwitchLoadedInterval = setInterval(checkTwitchLoaded, 50);
+                clearInterval(autoUpdateViewerCountInterval);
                 break;
             case 'livestream':
                 $twitchPlayer.hide();
