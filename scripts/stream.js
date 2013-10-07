@@ -1,9 +1,14 @@
-var twitchMainChannel = 'Destructoid';
+var twitchMainChannel = 'TGN';
 var twitchSecondaryChannel = 'MANvsGAME';
 var twitchQuality = 'live';
 var livestreamChannel = 'hardcore_bro';
 var defaultVolume = 50;
 var autoswitch = true;
+var paused = false;
+var checkTwitchLoadedFrequency = 50;
+var checkTwitchLiveFrequency = 10000;
+var updateTitleFrequency = 10000;
+var autoUpdateViewerCountFrequency = 5000;
 
 var rememberedVolume = 50;
 
@@ -59,17 +64,19 @@ $(document).ready(function () {
     $twitchPlayer = $("#twitch-player");
     console.log($twitchPlayer);
     if (currentPlayer == 'twitch') {
-        checkTwitchLoadedInterval = setInterval(checkTwitchLoaded, 50);
+        checkTwitchLoadedInterval = setInterval(checkTwitchLoaded,
+            checkTwitchLoadedFrequency);
     }
 
     $lsPlayer = $("#livestream-player");
     console.log($lsPlayer);
 
-    setInterval(updateTitle, 10000);
+    setInterval(updateTitle, updateTitleFrequency);
 
     if (autoswitch) {
         switchIfTwitchLive();
-        switchIfTwitchLiveInterval = setInterval(switchIfTwitchLive, 10000);
+        switchIfTwitchLiveInterval = setInterval(switchIfTwitchLive,
+            checkTwitchLiveFrequency);
     }
 
     $(window).resize(function () {
@@ -96,17 +103,18 @@ function twitchInit() {
 
 function twitchCallback(e, info) {
     console.info("twitchCallback: " + e);
+    if (e == 'video_not_found') {
+        setTimeout(switchIfTwitchLive, 3000);
+    }
+    if (e == 'broadcast_finished' || e == 'stream_lost' && !paused) {
+        if (autoswitch == true) {
+            changePlayer('livestream');
+            switchIfTwitchLiveInterval =
+                setInterval(switchIfTwitchLive, checkTwitchLiveFrequency);
+        }
+    }
     if (e == 'stream_viewer_count') {
-        console.info('stream_viewer_count')
-    }
-    if (e == 'connected') {
-        console.info('connected')
-    }
-    if (e == 'broadcast_finished' || e == 'stream_lost') {
-        console.info('broadcast_finished')
-    }
-    if (e == 'stream_viewer_count') {
-        updateViewerCount(info.stream.toString())
+        updateViewerCount(info.stream.toString());
     }
 }
 
@@ -124,7 +132,7 @@ function livestreamInit() {
     updateViewerCount($lsPlayer[0].getViewerCount());
     autoUpdateViewerCountInterval = setInterval(function () {
         updateViewerCount($lsPlayer[0].getViewerCount())
-    }, 5000);
+    }, autoUpdateViewerCountFrequency);
 }
 
 function livestreamCallback(e) {
@@ -140,17 +148,20 @@ function livestreamCallback(e) {
 
 function play() {
     console.log('play');
+    paused = false;
     if (currentPlayer == 'twitch') {
         $twitchPlayer[0].play_live(currentTwitchChannel, twitchQuality)
     } else {
         $lsPlayer[0].startPlayback();
     }
+    changeVolume($volumeSlider.slider('value'));
     $playPauseImage.attr('src', 'images/pause.png');
     $playPauseButton.off('click').on('click', pause);
 }
 
 function pause() {
     console.log('pause');
+    paused = true;
     if (currentPlayer == 'twitch') {
         $twitchPlayer[0].pause_video()
     } else {
@@ -242,29 +253,35 @@ function channelDropdown(choice) {
             autoswitch = true;
             if (currentPlayer == 'livestream') {
                 switchIfTwitchLiveInterval =
-                    setInterval(switchIfTwitchLive, 10000);
+                    setInterval(switchIfTwitchLive, checkTwitchLiveFrequency);
             }
             break;
         case 'twitch1':
-            currentTwitchChannel = twitchMainChannel;
-            autoswitch = false;
-            clearInterval(switchIfTwitchLiveInterval);
-            if (currentPlayer == 'twitch') {
-                play();
-                updateTitle();
-            } else {
-                changePlayer('twitch')
+            if (currentTwitchChannel != twitchMainChannel ||
+                currentPlayer != 'twitch') {
+                currentTwitchChannel = twitchMainChannel;
+                autoswitch = false;
+                clearInterval(switchIfTwitchLiveInterval);
+                if (currentPlayer == 'twitch') {
+                    play();
+                    updateTitle();
+                } else {
+                    changePlayer('twitch')
+                }
             }
             break;
         case 'twitch2':
-            currentTwitchChannel = twitchSecondaryChannel;
-            autoswitch = false;
-            clearInterval(switchIfTwitchLiveInterval);
-            if (currentPlayer == 'twitch') {
-                play();
-                updateTitle();
-            } else {
-                changePlayer('twitch')
+            if (currentTwitchChannel != twitchSecondaryChannel ||
+                currentPlayer != 'twitch') {
+                currentTwitchChannel = twitchSecondaryChannel;
+                autoswitch = false;
+                clearInterval(switchIfTwitchLiveInterval);
+                if (currentPlayer == 'twitch') {
+                    play();
+                    updateTitle();
+                } else {
+                    changePlayer('twitch')
+                }
             }
             break;
         case 'livestream':
@@ -313,7 +330,7 @@ function switchIfTwitchLive() {
                     changePlayer('twitch');
                     clearInterval(switchIfTwitchLiveInterval);
                 } else {
-
+                    changePlayer('livestream');
                 }
             });
         }
