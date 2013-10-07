@@ -3,10 +3,12 @@ var twitchSecondaryChannel = 'MANvsGAME';
 var twitchQuality = 'live';
 var livestreamChannel = 'hardcore_bro';
 var defaultVolume = 50;
+var autoswitch = true;
 
 var rememberedVolume = 50;
 
 var checkTwitchLoadedInterval;
+var switchIfTwitchLiveInterval;
 var autoUpdateViewerCountInterval;
 
 var $twitchPlayer;
@@ -65,10 +67,16 @@ $(document).ready(function () {
 
     setInterval(updateTitle, 10000);
 
+    if (autoswitch) {
+        switchIfTwitchLive();
+        switchIfTwitchLiveInterval = setInterval(switchIfTwitchLive, 10000);
+    }
+
     $(window).resize(function () {
         $twitchPlayer.center()
     });
 });
+
 
 function checkTwitchLoaded() {
     console.log('twitch PercentLoaded: ' + $twitchPlayer[0].PercentLoaded());
@@ -230,8 +238,17 @@ function updateViewerCount(viewers) {
 function channelDropdown(choice) {
     console.log("channelDropdown: " + choice);
     switch (choice) {
+        case 'auto':
+            autoswitch = true;
+            if (currentPlayer == 'livestream') {
+                switchIfTwitchLiveInterval =
+                    setInterval(switchIfTwitchLive, 10000);
+            }
+            break;
         case 'twitch1':
             currentTwitchChannel = twitchMainChannel;
+            autoswitch = false;
+            clearInterval(switchIfTwitchLiveInterval);
             if (currentPlayer == 'twitch') {
                 play();
                 updateTitle();
@@ -241,6 +258,8 @@ function channelDropdown(choice) {
             break;
         case 'twitch2':
             currentTwitchChannel = twitchSecondaryChannel;
+            autoswitch = false;
+            clearInterval(switchIfTwitchLiveInterval);
             if (currentPlayer == 'twitch') {
                 play();
                 updateTitle();
@@ -249,6 +268,8 @@ function channelDropdown(choice) {
             }
             break;
         case 'livestream':
+            autoswitch = false;
+            clearInterval(switchIfTwitchLiveInterval);
             changePlayer('livestream');
             break;
     }
@@ -272,4 +293,30 @@ function changePlayer(player) {
                 break;
         }
     }
+}
+
+function switchIfTwitchLive() {
+    console.log("switchIfTwitchLive");
+    $.getJSON('https://api.twitch.tv/kraken/streams/' + twitchMainChannel +
+        '?callback=?', function (data) {
+        if (data.stream) { // Channel is live
+            console.log(twitchMainChannel + " is live, switching");
+            currentTwitchChannel = twitchMainChannel;
+            changePlayer('twitch');
+            clearInterval(switchIfTwitchLiveInterval);
+        } else {
+            $.getJSON('https://api.twitch.tv/kraken/streams/' + twitchSecondaryChannel +
+                '?callback=?', function (data) {
+                if (data.stream) { // Channel is live
+                    console.log(twitchSecondaryChannel + " is live, switching");
+                    currentTwitchChannel = twitchSecondaryChannel;
+                    changePlayer('twitch');
+                    clearInterval(switchIfTwitchLiveInterval);
+                } else {
+
+                }
+            });
+        }
+    });
+    console.log("end of switchIfTwitchLive");
 }
