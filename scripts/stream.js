@@ -30,8 +30,7 @@ var $titleText;
 var $titleTextSpan;
 var $channelDropdown;
 
-//var currentPlayer = 'twitch';
-var currentPlayer = 'livestream';
+var currentPlayer = 'twitch';
 var currentTwitchChannel = twitchMainChannel;
 
 jQuery.fn.center = function () {
@@ -88,6 +87,9 @@ $(document).ready(function () {
         $twitchPlayer.center();
         scrollIfTooLong();
     });
+
+    console.log('slider value: ' + $volumeSlider.slider('value'));
+    console.log('value2: ' + $volumeSlider.value);
 });
 
 
@@ -110,20 +112,19 @@ function twitchInit() {
     $twitchPlayer.center();
     play();
     updateTitle();
-    $twitchPlayer[0].change_volume(defaultVolume)
+    $twitchPlayer[0].change_volume($volumeSlider.slider('value'));
 }
 
 function twitchCallback(e, info) {
     console.info("twitchCallback: " + e);
-    if (e == 'video_not_found') {
+    if (e == 'video_not_found' && autoswitch) {
         setTimeout(switchIfTwitchLive, 3000);
     }
-    if (e == 'broadcast_finished' || e == 'stream_lost' && !paused) {
-        if (autoswitch == true) {
-            changePlayer('livestream');
-            switchIfTwitchLiveInterval =
-                setInterval(switchIfTwitchLive, checkTwitchLiveFrequency);
-        }
+    if ((e == 'broadcast_finished' || e == 'stream_lost')
+        && !paused && autoswitch) {
+        changePlayer('livestream');
+        switchIfTwitchLiveInterval =
+            setInterval(switchIfTwitchLive, checkTwitchLiveFrequency);
     }
     if (e == 'stream_viewer_count') {
         updateViewerCount(info.stream.toString());
@@ -140,7 +141,7 @@ function livestreamInit() {
     $lsPlayer[0].showThumbnail(true);
     play();
     updateTitle();
-    $lsPlayer[0].setVolume(defaultVolume / 100);
+    $lsPlayer[0].setVolume($volumeSlider.slider('value') / 100);
     updateViewerCount($lsPlayer[0].getViewerCount());
     autoUpdateViewerCountInterval = setInterval(function () {
         updateViewerCount($lsPlayer[0].getViewerCount())
@@ -152,7 +153,7 @@ function livestreamCallback(e) {
     if (e == 'ready') {
         livestreamInit()
     } else if (e == 'connectionEvent') {
-        setTimeout(updateTitle, 1000)
+        setTimeout(updateTitle, 1000);
     } else if (e == 'playbackEvent') {
         updateTitle()
     }
@@ -228,6 +229,8 @@ function updateTitle() {
             var text;
             if (data.stream) { // Twitch is live
                 text = data.stream.channel.status;
+                // We might as well update the viewer count using the same request
+                updateViewerCount(data.stream.viewers);
             } else {
                 text = "Channel offline.";
             }
@@ -279,7 +282,7 @@ function updateViewerCount(viewers) {
         postText = "Bros!!"
     }
     var text = viewers + ' ' + postText;
-    var width = text.length *7;
+    var width = text.length * 8;
     $viewerCount.width(width);
     $titleText.css({left: 190 + width});
     $viewerCount.text(text);
@@ -291,6 +294,7 @@ function channelDropdown(choice) {
         case 'auto':
             autoswitch = true;
             if (currentPlayer == 'livestream') {
+                switchIfTwitchLive();
                 switchIfTwitchLiveInterval =
                     setInterval(switchIfTwitchLive, checkTwitchLiveFrequency);
             }
