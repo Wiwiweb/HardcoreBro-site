@@ -15,6 +15,8 @@ var rememberedVolume = 50;
 var checkTwitchLoadedInterval;
 var switchIfTwitchLiveInterval;
 var autoUpdateViewerCountInterval;
+var scrollTextInterval = false;
+var reloadTwitchOnForbiddenTimeout;
 
 var $twitchPlayer;
 var $lsPlayer;
@@ -25,6 +27,7 @@ var $volumeSliderImage;
 var $muteButton;
 var $viewerCount;
 var $titleText;
+var $titleTextSpan;
 var $channelDropdown;
 
 //var currentPlayer = 'twitch';
@@ -48,6 +51,7 @@ $(document).ready(function () {
     $volumeSliderImage = $('#volume-button-image');
     $viewerCount = $('#viewer-count');
     $titleText = $('#title-text');
+    $titleTextSpan = $titleText.children('span');
     $channelDropdown = $('#channel-dropdown');
 
     $volumeSlider.slider({
@@ -66,6 +70,7 @@ $(document).ready(function () {
     if (currentPlayer == 'twitch') {
         checkTwitchLoadedInterval = setInterval(checkTwitchLoaded,
             checkTwitchLoadedFrequency);
+        reloadTwitchOnForbiddenTimeout = setTimeout(reloadTwitch, 5000);
     }
 
     $lsPlayer = $("#livestream-player");
@@ -80,7 +85,8 @@ $(document).ready(function () {
     }
 
     $(window).resize(function () {
-        $twitchPlayer.center()
+        $twitchPlayer.center();
+        scrollIfTooLong();
     });
 });
 
@@ -90,7 +96,13 @@ function checkTwitchLoaded() {
     if ($twitchPlayer[0].PercentLoaded() == 100) {
         twitchInit();
         clearInterval(checkTwitchLoadedInterval);
+        clearTimeout(reloadTwitchOnForbiddenTimeout);
     }
+}
+
+function reloadTwitch() {
+    $twitchPlayer.hide();
+    $twitchPlayer.show();
 }
 
 function twitchInit() {
@@ -220,15 +232,38 @@ function updateTitle() {
                 text = "Channel offline.";
             }
             console.log('updateTitle: ' + text);
-            $titleText.text(text);
+            $titleTextSpan.text(text);
         });
     } else {
         var text = $lsPlayer[0].getCurrentContentTitle();
         if (text != null) {
-            $titleText.text(text);
+            $titleTextSpan.text(text);
         }
         console.log('updateTitle: ' + text);
     }
+
+    // Need time to update the text
+    setTimeout(scrollIfTooLong, 100);
+}
+
+function scrollIfTooLong() {
+    if ($titleTextSpan.width() >= $titleTextSpan.parent().width()) {
+        console.log('start scrolling');
+        if (!scrollTextInterval) {
+            scrollTextInterval = setInterval(scrollText, 50);
+        }
+    } else {
+        clearInterval(scrollTextInterval);
+        scrollTextInterval = false;
+        $titleTextSpan.css({left: 0});
+    }
+}
+
+function scrollText() {
+    var width = $titleTextSpan.width();
+    var left = $titleTextSpan.position().left - 1;
+    left = -left > width ? width : left;
+    $titleTextSpan.css({left: left});
 }
 
 function updateViewerCount(viewers) {
@@ -243,7 +278,11 @@ function updateViewerCount(viewers) {
     } else {
         postText = "Bros!!"
     }
-    $viewerCount.text(viewers + ' ' + postText);
+    var text = viewers + ' ' + postText;
+    var width = text.length *7;
+    $viewerCount.width(width);
+    $titleText.css({left: 190 + width});
+    $viewerCount.text(text);
 }
 
 function channelDropdown(choice) {
@@ -302,6 +341,7 @@ function changePlayer(player) {
                 $lsPlayer.hide();
                 $twitchPlayer.show();
                 checkTwitchLoadedInterval = setInterval(checkTwitchLoaded, 50);
+                reloadTwitchOnForbiddenTimeout = setTimeout(reloadTwitch, 5000);
                 clearInterval(autoUpdateViewerCountInterval);
                 break;
             case 'livestream':

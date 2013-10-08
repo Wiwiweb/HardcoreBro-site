@@ -20,7 +20,7 @@
             data="http://www.justin.tv/widgets/live_api_player.swf"
             width="100%" height="100%"
             bgcolor="#000000"
-            style="display: none;">
+            style="display: block;">
         <param name="allowFullScreen" value="true">
         <param name="allowscriptaccess" value="always">
         <param name="movie"
@@ -31,7 +31,7 @@
     <object type="application/x-shockwave-flash" id="livestream-player"
             data="http://cdn.livestream.com/chromelessPlayer/v20/playerapi.swf"
             width="100%" height="100%"
-            style="display: block;">
+            style="display: none;">
         <param name="AllowScriptAccess" value="always">
         <param name="Allowfullscreen" value="true">
         <param name="wmode" value="window">
@@ -50,10 +50,8 @@
         </div>
         <div id="volume-slider"></div>
     </div>
-    <div id="viewer-count">
-        ? Bros
-    </div>
-    <div id="title-text">Loading...</div>
+    <div id="viewer-count">? Bros</div>
+    <div id="title-text"><span>Loading...</span></div>
     <div id="right-side">
         <select id="channel-dropdown">
             <option value="auto" selected="selected">Autoswitch</option>

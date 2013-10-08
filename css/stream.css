@@ -70,15 +70,24 @@ object {
     position: absolute;
     top: 0;
     padding-left: 5px;
+    padding-right: 5px;
     left: 180px;
-    width: 80px;
+    width: 42px;
+    text-align: left;
 }
 
 #title-text {
     position: absolute;
     top: 0;
-    left: 260px;
-    right: 260px;
+    left: 232px;
+    right: 180px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+#title-text span {
+    position: relative;
+    left: 0;
 }
 
 #right-side {
@@ -86,7 +95,7 @@ object {
     top: 0;
     right: 0;
     border-left: 1px solid #000000;
-    width: 260px
+    width: 180px
 }
 
 #play-button-image {
