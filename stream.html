@@ -9,7 +9,6 @@
             src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script type="text/javascript"
             src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="scripts/swfobject.js"></script>
     <script type="text/javascript" src="scripts/stream.js"></script>
     <title>HCB Stream Window</title>
 </head>
@@ -20,7 +19,7 @@
             data="http://www.justin.tv/widgets/live_api_player.swf"
             width="100%" height="100%"
             bgcolor="#000000"
-            style="display: block;">
+            style="display: none;">
         <param name="allowFullScreen" value="true">
         <param name="allowscriptaccess" value="always">
         <param name="movie"
@@ -38,6 +37,7 @@
         <param name="flashvars" value="jscallback=livestreamCallback">
     </object>
 </div>
+
 
 <div id="stream-bar">
     <div id="play-pause" class="button">
