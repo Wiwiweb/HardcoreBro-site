@@ -11,6 +11,7 @@
             src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <script type="text/javascript" src="scripts/stream.js"></script>
     <title>HCB Stream Window</title>
+    <base target="_blank" />
 </head>
 <body>
 
@@ -57,8 +58,10 @@
             <option value="auto" selected="selected">Autoswitch</option>
             <option value="twitch1">Main Channel</option>
             <option value="twitch2">Movie Channel</option>
+            <option value="twitch-custom">Custom Twitch Channel</option>
             <option value="livestream">Livestream (Autoplay)</option>
         </select>
+       <input id="custom-twitch-textbox" type="text" style="display: none;"/>
     </div>
 </div>
 

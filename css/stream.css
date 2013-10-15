@@ -9,6 +9,26 @@ object {
     bottom: 0;
 }
 
+a:link {
+    color: #CCCCFF;
+    text-decoration: none;
+}
+
+a:visited {
+    color: #CCCCFF;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #CCCCCC;
+    text-decoration: underline;
+}
+
+a:active {
+    color: #CCCCCC;
+    text-decoration: underline;
+}
+
 #video-container {
     position: fixed;
     top: 0;
@@ -83,6 +103,8 @@ object {
     right: 180px;
     white-space: nowrap;
     overflow: hidden;
+    -webkit-transition: .5s;
+    transition: .5s;
 }
 
 #title-text span {
@@ -95,7 +117,9 @@ object {
     top: 0;
     right: 0;
     border-left: 1px solid #000000;
-    width: 180px
+    width: 180px;
+    -webkit-transition: .5s;
+    transition: .5s;
 }
 
 #play-button-image {

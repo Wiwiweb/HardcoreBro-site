@@ -1,10 +1,11 @@
 var twitchMainChannel = 'hardcore_bro';
-var twitchSecondaryChannel = 'nisan88';
+var twitchSecondaryChannel = 'darianHCB';
 var twitchQuality = 'live';
 var livestreamChannel = 'hardcore_bro';
 var defaultVolume = 50;
 var autoswitch = true;
 var paused = false;
+var previousTitle = ''
 
 var checkTwitchLoadedFrequency = 50;
 var updateLivestreamTitleFrequency = 1000;
@@ -16,6 +17,7 @@ var rememberedVolume = 50;
 
 var checkTwitchLoadedInterval;
 var reloadTwitchOnForbiddenTimeout;
+var customTwitchTypeTimeout;
 
 var updateLivestreamTitleInterval;
 var updateLivestreamViewerCountInterval;
@@ -33,7 +35,9 @@ var $muteButton;
 var $viewerCount;
 var $titleText;
 var $titleTextSpan;
+var $rightSide;
 var $channelDropdown;
+var $customTwitchTextbox;
 
 // This might change via cookies in the future
 var currentPlayer = 'none';
@@ -47,8 +51,6 @@ jQuery.fn.center = function () {
 
 
 $(document).ready(function () {
-    console.info('ready');
-    console.info(document.domain);
 
     // All jQuery selectors
     $playPauseButton = $('#play-pause');
@@ -59,21 +61,24 @@ $(document).ready(function () {
     $viewerCount = $('#viewer-count');
     $titleText = $('#title-text');
     $titleTextSpan = $titleText.children('span');
+    $rightSide = $('#right-side');
     $channelDropdown = $('#channel-dropdown');
+    $customTwitchTextbox = $('#custom-twitch-textbox');
     $twitchPlayer = $("#twitch-player");
     $lsPlayer = $("#livestream-player");
 
     // Add events
     $volumeSlider.slider({
-        range: "min",
+        range: 'min',
         value: defaultVolume,
         animate: 100,
         slide: volumeSlider
     });
     $muteButton.click(mute);
     $channelDropdown.change(function () {
-        channelDropdown($channelDropdown[0].value)
+        channelDropdown($channelDropdown.val())
     });
+    $customTwitchTextbox.on('input', customTwitchType);
 
     // HTML starts with everything at display: none
     // Depending on settings, load appropriate player
@@ -86,7 +91,7 @@ $(document).ready(function () {
 });
 
 function loadTwitch() {
-    console.info("loadTwitch");
+    console.debug('loadTwitch');
     $lsPlayer.hide();
     $twitchPlayer.show();
     clearInterval(updateLivestreamTitleInterval);
@@ -98,7 +103,7 @@ function loadTwitch() {
 }
 
 function checkTwitchLoaded() {
-    console.log('twitch PercentLoaded: ' + $twitchPlayer[0].PercentLoaded());
+    console.debug('twitch PercentLoaded: ' + $twitchPlayer[0].PercentLoaded());
     if ($twitchPlayer[0].PercentLoaded() == 100) {
         twitchInit();
         clearInterval(checkTwitchLoadedInterval);
@@ -107,13 +112,13 @@ function checkTwitchLoaded() {
 }
 
 function reloadTwitch() {
-    console.info("reloadTwitch");
+    console.debug('reloadTwitch');
     $twitchPlayer.hide();
     $twitchPlayer.show();
 }
 
 function twitchInit() {
-    console.info("twitchInit");
+    console.debug('twitchInit');
     $twitchPlayer.center();
     play();
     $twitchPlayer[0].change_volume($volumeSlider.slider('value'));
@@ -122,7 +127,7 @@ function twitchInit() {
 }
 
 function loadLivestream() {
-    console.info("loadLivestream");
+    console.debug('loadLivestream');
     $twitchPlayer.hide();
     $lsPlayer.show();
     clearInterval(twitchUpdateCallInterval);
@@ -135,6 +140,7 @@ function loadLivestream() {
 }
 
 function turnAutoswitchOn() {
+    console.debug('turnAutoswitchOn');
     autoswitch = true;
     if (currentPlayer == 'livestream') {
         switchIfTwitchLive();
@@ -145,14 +151,13 @@ function turnAutoswitchOn() {
 }
 
 function turnAutoswitchOff() {
+    console.debug('turnAutoswitchOff');
     autoswitch = false;
-    if (currentPlayer == 'livestream') {
-        clearInterval(switchIfTwitchLiveInterval);
-    }
+    clearInterval(switchIfTwitchLiveInterval);
 }
 
 function twitchCallback(e, info) {
-    console.info("twitchCallback: " + e);
+    console.debug('twitchCallback: ' + e);
     if (e == 'video_not_found' && autoswitch) {
         setTimeout(switchIfTwitchLive, 3000);
     }
@@ -162,7 +167,7 @@ function twitchCallback(e, info) {
 }
 
 function livestreamInit() {
-    console.info("livestreamInit");
+    console.debug('livestreamInit');
     $lsPlayer[0].load(livestreamChannel);
     $lsPlayer[0].showPlayButton(false);
     $lsPlayer[0].showPauseButton(false);
@@ -182,7 +187,7 @@ function livestreamInit() {
 }
 
 function livestreamCallback(e) {
-    console.info("livestreamCallback: " + e);
+    console.debug('livestreamCallback: ' + e);
     if (e == 'ready') {
         livestreamInit();
     } else if (e == 'connectionEvent') {
@@ -194,10 +199,15 @@ function livestreamCallback(e) {
 
 function updateLivestreamTitle() {
     var text = $lsPlayer[0].getCurrentContentTitle();
-    if (text != null) {
-        $titleTextSpan.text(text);
+    if (text != null && text != previousTitle) {
+        console.info("Update Livestream title: " + text);
+        previousTitle = text;
+        text = '<a href="http://www.google.com/search?q='
+            + encodeURIComponent(text) + '&btnI">'
+            + text +
+            '</a>';
+        $titleTextSpan.html(text);
     }
-    console.log('updateLivestreamTitle: ' + text);
 
     // Need time to update the text
     setTimeout(scrollIfTooLong, 100);
@@ -205,7 +215,7 @@ function updateLivestreamTitle() {
 
 function scrollIfTooLong() {
     if ($titleTextSpan.width() >= $titleTextSpan.parent().width()) {
-        console.log('start scrolling');
+        console.debug('start scrolling');
         if (!scrollTextInterval) {
             scrollTextInterval = setInterval(scrollText, 50);
         }
@@ -224,7 +234,7 @@ function scrollText() {
 }
 
 function updateViewerCount(viewers) {
-    console.log('updateViewerCount: ' + viewers);
+    console.debug('updateViewerCount: ' + viewers);
     var postText;
     if (viewers == 1) {
         postText = "Bro"
@@ -242,19 +252,23 @@ function updateViewerCount(viewers) {
     $viewerCount.text(text);
 }
 
+function twitchChangeChannel() {
+    console.debug("twitchChangeChannel: " + currentTwitchChannel);
+    changePlayer('twitch');
+    twitchUpdateCall();
+}
+
 function changePlayer(player) {
-    console.log("changePlayer: " + player);
+    console.debug("changePlayer: " + player);
     if (player != currentPlayer) {
         currentPlayer = player;
         clearInterval(checkTwitchLoadedInterval);
         switch (player) {
             case 'twitch':
                 loadTwitch();
-                clearInterval(updateLivestreamViewerCountInterval);
                 break;
             case 'livestream':
-                $twitchPlayer.hide();
-                $lsPlayer.show();
+                loadLivestream();
                 break;
         }
     } else {
@@ -264,20 +278,20 @@ function changePlayer(player) {
 
 // While twitch is not on, check if any twitch channel goes live
 function switchIfTwitchLive() {
-    console.log("switchIfTwitchLive");
+    console.debug('switchIfTwitchLive');
     $.getJSON('https://api.twitch.tv/kraken/streams/' + twitchMainChannel +
         '?callback=?', function (data) {
         if (data.stream) { // Channel is live
-            console.log(twitchMainChannel + " is live, switching");
+            console.info(twitchMainChannel + " is live, switching");
             currentTwitchChannel = twitchMainChannel;
-            changePlayer('twitch');
+            twitchChangeChannel();
         } else {
             $.getJSON('https://api.twitch.tv/kraken/streams/' +
                 twitchSecondaryChannel + '?callback=?', function (data) {
                 if (data.stream) { // Channel is live
-                    console.log(twitchSecondaryChannel + " is live, switching");
+                    console.info(twitchSecondaryChannel + " is live, switching");
                     currentTwitchChannel = twitchSecondaryChannel;
-                    changePlayer('twitch');
+                    twitchChangeChannel();
                 } else {
                     changePlayer('livestream');
                 }
@@ -288,39 +302,47 @@ function switchIfTwitchLive() {
 
 // While twitch is on, update text, viewercount, and check live status
 function twitchUpdateCall() {
-    console.log('twitchUpdateCall for channel ' + currentTwitchChannel);
+    console.debug('twitchUpdateCall for channel ' + currentTwitchChannel);
     $.getJSON('https://api.twitch.tv/kraken/streams/' + currentTwitchChannel +
         '?callback=?', function (data) {
+        var text;
         if (data.stream) {
             // Twitch is live, update text and viewercount
-            $titleTextSpan.text(data.stream.channel.status);
-            setTimeout(scrollIfTooLong, 100);
+            text = data.stream.channel.status;
             updateViewerCount(data.stream.viewers);
         }
         else {
             // Twitch went offline, check if other channel is live, and switch
-            console.log(twitchMainChannel + " is offline");
-            var otherChannel = currentTwitchChannel == twitchMainChannel ?
-                twitchSecondaryChannel : twitchMainChannel;
-            $.getJSON('https://api.twitch.tv/kraken/streams/' + otherChannel +
-                '?callback=?', function (data) {
-                if (data.stream) {
-                    console.log(otherChannel + " is live, switching");
-                    currentTwitchChannel = otherChannel;
-                    twitchUpdateCall();
-                } else {
-                    console.log("no twitch channel is live," +
-                        " switching to livestream");
-                    changePlayer('livestream');
-                }
-            });
+            console.info(currentTwitchChannel + " is offline");
+            text = "Channel offline.";
+            if (autoswitch) {
+                var otherChannel = currentTwitchChannel == twitchMainChannel ?
+                    twitchSecondaryChannel : twitchMainChannel;
+                $.getJSON('https://api.twitch.tv/kraken/streams/' + otherChannel +
+                    '?callback=?', function (data) {
+                    if (data.stream) {
+                        console.info(otherChannel + " is live, switching");
+                        twitchChangeChannel();
+                    } else {
+                        console.info("No twitch channel is live," +
+                            " switching to livestream");
+                        changePlayer('livestream');
+                    }
+                });
+            }
+        }
+        if (previousTitle != text) {
+            console.info("Update Twitch title: " + text);
+            previousTitle = text;
+            $titleTextSpan.text(text);
+            setTimeout(scrollIfTooLong, 100);
         }
     });
 }
 
 
 function play() {
-    console.log('play');
+    console.debug('play');
     paused = false;
     if (currentPlayer == 'twitch') {
         $twitchPlayer[0].play_live(currentTwitchChannel, twitchQuality)
@@ -333,7 +355,7 @@ function play() {
 }
 
 function pause() {
-    console.log('pause');
+    console.debug('pause');
     paused = true;
     if (currentPlayer == 'twitch') {
         $twitchPlayer[0].pause_video()
@@ -350,7 +372,7 @@ function volumeSlider(event, ui) {
 }
 
 function changeVolume(volume) {
-    console.log('changeVolume: ' + volume);
+    console.debug('changeVolume: ' + volume);
     if (currentPlayer == 'twitch') {
         $twitchPlayer[0].change_volume(volume)
     } else {
@@ -368,7 +390,7 @@ function changeVolume(volume) {
 }
 
 function mute() {
-    console.log('mute');
+    console.debug('mute');
     var volume;
     if ($volumeSlider.slider('value') == 0) {
         if (rememberedVolume == 0) {
@@ -383,40 +405,73 @@ function mute() {
 }
 
 function channelDropdown(choice) {
-    console.log("channelDropdown: " + choice);
-    switch (choice) {
-        case 'auto':
-            turnAutoswitchOn();
-            break;
-        case 'twitch1':
-            if (currentTwitchChannel != twitchMainChannel ||
-                currentPlayer != 'twitch') {
-                turnAutoswitchOff();
-                currentTwitchChannel = twitchMainChannel;
-                if (currentPlayer == 'twitch') {
-                    play();
-                    twitchUpdateCall();
-                } else {
-                    changePlayer('twitch');
+    console.debug('channelDropdown: ' + choice);
+    if (choice == 'auto') {
+        turnAutoswitchOn();
+    } else {
+        turnAutoswitchOff();
+        switch (choice) {
+            case 'twitch1':
+                if (currentTwitchChannel != twitchMainChannel ||
+                    currentPlayer != 'twitch') {
+                    currentTwitchChannel = twitchMainChannel;
+                    twitchChangeChannel();
                 }
-            }
-            break;
-        case 'twitch2':
-            if (currentTwitchChannel != twitchSecondaryChannel ||
-                currentPlayer != 'twitch') {
-                turnAutoswitchOff();
-                currentTwitchChannel = twitchSecondaryChannel;
-                if (currentPlayer == 'twitch') {
-                    play();
-                    twitchUpdateCall();
-                } else {
-                    changePlayer('twitch');
+                break;
+            case 'twitch2':
+                if (currentTwitchChannel != twitchSecondaryChannel ||
+                    currentPlayer != 'twitch') {
+                    currentTwitchChannel = twitchSecondaryChannel;
+                    twitchChangeChannel();
                 }
-            }
-            break;
-        case 'livestream':
-            turnAutoswitchOff();
-            changePlayer('livestream');
-            break;
+                break;
+            case 'twitch-custom':
+                if (currentTwitchChannel != $customTwitchTextbox.val() ||
+                    currentPlayer != 'twitch') {
+                    customTwitchPlayIfReal();
+                }
+                break;
+            case 'livestream':
+                changePlayer('livestream');
+                break;
+        }
     }
+    toggleCustomTwitchTextbox();
+}
+
+function toggleCustomTwitchTextbox() {
+    console.debug('toggleCustomTwitchTextbox');
+    if ($channelDropdown.val() == 'twitch-custom') {
+        // Turn on
+        $rightSide.width(360);
+        $titleText.css({right: 360});
+        scrollIfTooLong();
+        $customTwitchTextbox.show();
+    } else {
+        // Turn off
+        $rightSide.width(180);
+        $titleText.css({right: 180});
+        scrollIfTooLong();
+        $customTwitchTextbox.hide();
+    }
+}
+
+function customTwitchType() {
+    console.debug('customTwitchType: ' + $customTwitchTextbox.val());
+    clearTimeout(customTwitchTypeTimeout);
+    customTwitchTypeTimeout = setTimeout(customTwitchPlayIfReal, 500);
+}
+
+function customTwitchPlayIfReal() {
+    console.debug('customTwitchPlayIfReal: ' + $customTwitchTextbox.val());
+    $.getJSON('https://api.twitch.tv/kraken/channels/' +
+        $customTwitchTextbox.val() + '?callback=?', function (data) {
+        if (data.status != 404) {
+            console.info($customTwitchTextbox.val() + " exists, switching");
+            currentTwitchChannel = $customTwitchTextbox.val();
+            twitchChangeChannel();
+        } else {
+            console.info($customTwitchTextbox.val() + " doesn't exist");
+        }
+    });
 }

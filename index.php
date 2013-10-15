@@ -7,8 +7,8 @@
 	<title>Hardcore Bro - No casuals allowed!</title>
 	<meta name="description" content="Streaming video games with a funny accent.">
 	<meta name="keywords" content="video game live stream streaming feed hardcore bro">
-	<link rel="stylesheet" media="screen" type="text/css" title="Main" href="../style.css" />
-	<link rel="icon" type="image/gif" href="../favicon.gif">
+	<link rel="stylesheet" media="screen" type="text/css" title="Main" href="css/main.css" />
+	<link rel="icon" type="image/gif" href="../favicon.ico">
 	<script type="text/javascript" src="../scripts/index.js"></script>
 </head>
 
@@ -67,12 +67,12 @@
 		}
 	?>
 
-	<div class="box" style="width: 1200px">
+	<div id="main-container">
 
-		<iframe width="800" height="600" src="stream.html"></iframe>
+		<iframe id="player" frameborder="0" width="69%" height="600" src="stream.html"></iframe>
 
-		<iframe frameborder="0" scrolling="no" id="chat_embed" src="http://twitch.tv/chat/embed?channel=hardcore_bro"
-		 width="350" height="600"></iframe>
+		<iframe id="chat_embed" frameborder="0" src="http://twitch.tv/chat/embed?channel=hardcore_bro"
+		 width="29%" height="600"></iframe>
 	</div>
 
 	<div class="box" style="width: 800px">
