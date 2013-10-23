@@ -1,11 +1,10 @@
-var twitchMainChannel = 'TGN';
-var twitchSecondaryChannel = 'MANvsGAME';
+var twitchMainChannel = 'hardcore_bro';
+var twitchSecondaryChannel = 'darianHCB';
 var twitchQuality = 'live';
 var livestreamChannel = 'hardcore_bro';
 var defaultVolume = 50;
 var autoswitch = true;
 var paused = false;
-var previousTitle = '';
 
 var checkTwitchLoadedFrequency = 50;
 var updateLivestreamTitleFrequency = 1000;
@@ -14,11 +13,13 @@ var checkTwitchLiveFrequency = 5000;
 var twitchUpdateCallFrequency = 5000;
 
 var rememberedVolume;
+var previousTitle = '';
+var currentPlayer;
+var currentTwitchChannel;
 
 var checkTwitchLoadedInterval;
 var reloadTwitchOnForbiddenTimeout;
 var customTwitchTypeTimeout;
-
 var updateLivestreamTitleInterval;
 var updateLivestreamViewerCountInterval;
 var switchIfTwitchLiveInterval;
@@ -38,10 +39,6 @@ var $titleTextSpan;
 var $rightSide;
 var $channelDropdown;
 var $customTwitchTextbox;
-
-// This might change via cookies in the future
-var currentPlayer = 'none';
-var currentTwitchChannel = twitchMainChannel;
 
 jQuery.fn.center = function () {
     this.width(Math.min(this.height() * (4 / 3), this.parent().width()) + "px");
@@ -75,16 +72,24 @@ $(document).ready(function () {
     //hcb_custom_twitch: remember text in custom box
     var cookieVolume = $.cookie('hcb_remembered_volume');
     console.info('Cookie hcb_remembered_volume: ' + cookieVolume);
-    if(typeof cookieVolume === 'undefined') {
+    if (typeof cookieVolume === 'undefined') {
         cookieVolume = defaultVolume;
     }
     rememberedVolume = cookieVolume;
     var initialVolume = rememberedVolume;
     var cookieMute = $.cookie('hcb_mute');
     console.info('Cookie hcb_mute: ' + cookieMute);
-    if(cookieMute == 'true') {
+    if (cookieMute == 'true') {
         initialVolume = 0;
     }
+
+    var cookieDropdown = $.cookie('hcb_channel_dropdown');
+    console.info('Cookie hcb_channel_dropdown: ' + cookieDropdown);
+    if (typeof cookieDropdown !== 'undefined') {
+        $channelDropdown.val(cookieDropdown);
+        channelDropdown(cookieDropdown);
+    }
+
 
     // Add events
     $volumeSlider.slider({
@@ -102,7 +107,9 @@ $(document).ready(function () {
 
     // HTML starts with everything at display: none
     // Depending on settings, load appropriate player
-    switchIfTwitchLive();
+    if (autoswitch == true) {
+        switchIfTwitchLive();
+    }
 
     $(window).resize(function () {
         $twitchPlayer.center();
@@ -142,6 +149,7 @@ function twitchInit() {
     $twitchPlayer.center();
     play();
     $twitchPlayer[0].change_volume($volumeSlider.slider('value'));
+    twitchUpdateCall();
     twitchUpdateCallInterval =
         setInterval(twitchUpdateCall, twitchUpdateCallFrequency);
 }
@@ -256,7 +264,10 @@ function scrollText() {
 function updateViewerCount(viewers) {
     console.debug('updateViewerCount: ' + viewers);
     var postText;
-    if (viewers == 1) {
+    if(viewers == -1) {
+        viewers = '-';
+        postText = "Bros"
+    } else if (viewers == 1) {
         postText = "Bro"
     } else if (viewers <= 50) {
         postText = "Bros"
@@ -274,8 +285,15 @@ function updateViewerCount(viewers) {
 
 function twitchChangeChannel() {
     console.debug("twitchChangeChannel: " + currentTwitchChannel);
-    changePlayer('twitch');
-    twitchUpdateCall();
+    if (currentPlayer == 'twitch') {
+        twitchUpdateCall();
+        // Need to pause play because of a justin tv bug
+        // while switching from live to non-live
+        pause();
+        play();
+    } else {
+        changePlayer('twitch');
+    }
 }
 
 function changePlayer(player) {
@@ -291,8 +309,6 @@ function changePlayer(player) {
                 loadLivestream();
                 break;
         }
-    } else {
-        play();
     }
 }
 
@@ -349,6 +365,8 @@ function twitchUpdateCall() {
                         changePlayer('livestream');
                     }
                 });
+            } else {
+                updateViewerCount(-1);
             }
         }
         if (previousTitle != text) {
@@ -464,6 +482,7 @@ function channelDropdown(choice) {
         }
     }
     toggleCustomTwitchTextbox();
+    $.cookie('hcb_channel_dropdown', choice);
 }
 
 function toggleCustomTwitchTextbox() {
