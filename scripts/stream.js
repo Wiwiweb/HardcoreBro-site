@@ -1,11 +1,11 @@
-var twitchMainChannel = 'hardcore_bro';
-var twitchSecondaryChannel = 'darianHCB';
+var twitchMainChannel = 'TGN';
+var twitchSecondaryChannel = 'MANvsGAME';
 var twitchQuality = 'live';
 var livestreamChannel = 'hardcore_bro';
 var defaultVolume = 50;
 var autoswitch = true;
 var paused = false;
-var previousTitle = ''
+var previousTitle = '';
 
 var checkTwitchLoadedFrequency = 50;
 var updateLivestreamTitleFrequency = 1000;
@@ -13,7 +13,7 @@ var updateLivestreamViewerCountFrequency = 5000;
 var checkTwitchLiveFrequency = 5000;
 var twitchUpdateCallFrequency = 5000;
 
-var rememberedVolume = 50;
+var rememberedVolume;
 
 var checkTwitchLoadedInterval;
 var reloadTwitchOnForbiddenTimeout;
@@ -67,13 +67,33 @@ $(document).ready(function () {
     $twitchPlayer = $("#twitch-player");
     $lsPlayer = $("#livestream-player");
 
+
+    //Cookies we use
+    //hcb_remembered_volume: 0-100 - 0 is none
+    //hcb_mute: true/false
+    //hcb_channel_dropdown: remember choice
+    //hcb_custom_twitch: remember text in custom box
+    var cookieVolume = $.cookie('hcb_remembered_volume');
+    console.info('Cookie hcb_remembered_volume: ' + cookieVolume);
+    if(typeof cookieVolume === 'undefined') {
+        cookieVolume = defaultVolume;
+    }
+    rememberedVolume = cookieVolume;
+    var initialVolume = rememberedVolume;
+    var cookieMute = $.cookie('hcb_mute');
+    console.info('Cookie hcb_mute: ' + cookieMute);
+    if(cookieMute == 'true') {
+        initialVolume = 0;
+    }
+
     // Add events
     $volumeSlider.slider({
         range: 'min',
-        value: defaultVolume,
+        value: initialVolume,
         animate: 100,
         slide: volumeSlider
     });
+    changeVolumeImage(initialVolume);
     $muteButton.click(mute);
     $channelDropdown.change(function () {
         channelDropdown($channelDropdown.val())
@@ -368,7 +388,8 @@ function pause() {
 
 function volumeSlider(event, ui) {
     rememberedVolume = ui.value;
-    changeVolume(ui.value);
+    $.cookie('hcb_remembered_volume', rememberedVolume);
+    changeVolume(rememberedVolume);
 }
 
 function changeVolume(volume) {
@@ -378,6 +399,10 @@ function changeVolume(volume) {
     } else {
         $lsPlayer[0].setVolume(volume / 100)
     }
+    changeVolumeImage(volume);
+}
+
+function changeVolumeImage(volume) {
     if (volume > 80) {
         $volumeSliderImage.attr('src', 'images/volume_high.png')
     } else if (volume > 40) {
@@ -397,8 +422,10 @@ function mute() {
             rememberedVolume = defaultVolume;
         }
         volume = rememberedVolume;
+        $.cookie('hcb_mute', 'false');
     } else {
         volume = 0
+        $.cookie('hcb_mute', 'true');
     }
     changeVolume(volume);
     $volumeSlider.slider('value', volume);
