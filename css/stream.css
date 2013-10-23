@@ -37,6 +37,10 @@ a:active {
     background-color: #000000;
 }
 
+#livestream-player {
+    left: -150px;
+}
+
 #stream-bar {
     position: fixed;
     bottom: 0;

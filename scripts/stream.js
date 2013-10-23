@@ -46,6 +46,11 @@ jQuery.fn.center = function () {
         Math.max(0, (this.parent().width() - this.outerWidth()) / 2) + "px");
 };
 
+jQuery.fn.hideLivestreamWatermark = function () {
+    var newWidth = this.parent().width() + 300;
+    this.width(newWidth + "px");
+};
+
 
 $(document).ready(function () {
 
@@ -64,6 +69,9 @@ $(document).ready(function () {
     $twitchPlayer = $("#twitch-player");
     $lsPlayer = $("#livestream-player");
 
+    // jQuery resizing
+    $twitchPlayer.center();
+    $lsPlayer.hideLivestreamWatermark();
 
     //Cookies we use
     //hcb_remembered_volume: 0-100 - 0 is none
@@ -119,6 +127,7 @@ $(document).ready(function () {
 
     $(window).resize(function () {
         $twitchPlayer.center();
+        $lsPlayer.hideLivestreamWatermark();
         scrollIfTooLong();
     });
 });
@@ -152,7 +161,6 @@ function reloadTwitch() {
 
 function twitchInit() {
     console.debug('twitchInit');
-    $twitchPlayer.center();
     play();
     $twitchPlayer[0].change_volume($volumeSlider.slider('value'));
     twitchUpdateCall();
