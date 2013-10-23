@@ -68,8 +68,8 @@ $(document).ready(function () {
     //Cookies we use
     //hcb_remembered_volume: 0-100 - 0 is none
     //hcb_mute: true/false
-    //hcb_channel_dropdown: remember choice
     //hcb_custom_twitch: remember text in custom box
+    //hcb_channel_dropdown: remember choice
     var cookieVolume = $.cookie('hcb_remembered_volume');
     console.info('Cookie hcb_remembered_volume: ' + cookieVolume);
     if (typeof cookieVolume === 'undefined') {
@@ -81,6 +81,12 @@ $(document).ready(function () {
     console.info('Cookie hcb_mute: ' + cookieMute);
     if (cookieMute == 'true') {
         initialVolume = 0;
+    }
+
+    var cookieCustomTwitch = $.cookie('hcb_custom_twitch');
+    console.info('Cookie hcb_custom_twitch: ' + cookieCustomTwitch);
+    if (typeof cookieCustomTwitch !== 'undefined') {
+        $customTwitchTextbox.val(cookieCustomTwitch);
     }
 
     var cookieDropdown = $.cookie('hcb_channel_dropdown');
@@ -509,15 +515,17 @@ function customTwitchType() {
 }
 
 function customTwitchPlayIfReal() {
-    console.debug('customTwitchPlayIfReal: ' + $customTwitchTextbox.val());
+    var customTwitch = $customTwitchTextbox.val();
+    console.debug('customTwitchPlayIfReal: ' + customTwitch);
     $.getJSON('https://api.twitch.tv/kraken/channels/' +
-        $customTwitchTextbox.val() + '?callback=?', function (data) {
+        customTwitch + '?callback=?', function (data) {
         if (data.status != 404) {
-            console.info($customTwitchTextbox.val() + " exists, switching");
-            currentTwitchChannel = $customTwitchTextbox.val();
+            console.info(customTwitch + " exists, switching");
+            currentTwitchChannel = customTwitch;
             twitchChangeChannel();
+            $.cookie('hcb_custom_twitch', customTwitch)
         } else {
-            console.info($customTwitchTextbox.val() + " doesn't exist");
+            console.info(customTwitch + " doesn't exist");
         }
     });
 }
