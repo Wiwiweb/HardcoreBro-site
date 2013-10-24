@@ -3,8 +3,6 @@ var twitchSecondaryChannel = 'darianHCB';
 var twitchQuality = 'live';
 var livestreamChannel = 'hardcore_bro';
 var defaultVolume = 50;
-var autoswitch = true;
-var paused = false;
 
 var checkTwitchLoadedFrequency = 50;
 var updateLivestreamTitleFrequency = 1000;
@@ -16,7 +14,9 @@ var rememberedVolume;
 var previousTitle = '';
 var currentPlayer;
 var currentTwitchChannel;
-var twitch169Mode;
+var autoswitch = true;
+var paused = false;
+var twitch169Mode = true;
 
 var checkTwitchLoadedInterval;
 var reloadTwitchOnForbiddenTimeout;
@@ -26,6 +26,7 @@ var updateLivestreamViewerCountInterval;
 var switchIfTwitchLiveInterval;
 var twitchUpdateCallInterval;
 var scrollTextInterval = false;
+var twitchChangeRatioTimeout;
 
 var $videoContainer;
 var $twitchPlayer;
@@ -86,7 +87,6 @@ $(document).ready(function () {
     // hcb_mute: true/false
     // hcb_custom_twitch: remember text in custom box
     // hcb_channel_dropdown: remember choice
-    // hcb_twitch_169: true/false
 
     var cookieVolume = $.cookie('hcb_remembered_volume');
     console.info('Cookie hcb_remembered_volume: ' + cookieVolume);
@@ -114,18 +114,6 @@ $(document).ready(function () {
         channelDropdown(cookieDropdown);
     }
 
-    var cookieTwitch169 = $.cookie('hcb_twitch_169');
-    console.info('Cookie hcb_twitch_169: ' + cookieTwitch169);
-    if (cookieTwitch169 == 'false') {
-        twitchSet169Mode(false);
-    } else { // On undefined, default is true
-        // No need to call twitchSet169Mode because
-        // it's already on by default in the CSS
-        twitch169Mode = true;
-        $twitchPlayer.resize169();
-    }
-
-
     // Add events
     $volumeSlider.slider({
         range: 'min',
@@ -146,22 +134,32 @@ $(document).ready(function () {
         switchIfTwitchLive();
     }
 
-    $(window).resize(function () {
-        console.debug('window resize');
-        if ($videoContainer.width() / $videoContainer.height() >= (16 / 9)) {
-            if (twitch169Mode) {
-                $twitchPlayer.resize169();
-            } else {
-                twitchSet169Mode(true);
-            }
-        } else if (twitch169Mode) {
-            twitchSet169Mode(false);
-        }
-        $twitchPlayer.center();
-        $lsPlayer.hideLivestreamWatermark();
-        scrollIfTooLong();
-    });
+    windowResize();
+    $(window).resize(windowResize);
 });
+
+function windowResize() {
+    console.debug('windowResize');
+    clearTimeout(twitchChangeRatioTimeout);
+    if ($videoContainer.width() / $videoContainer.height() >= (16 / 9)) {
+        if (twitch169Mode) {
+            $twitchPlayer.resize169();
+        } else {
+            twitchChangeRatioTimeout =
+                setTimeout(function () {
+                    twitchSet169Mode(true)
+                }, 50);
+        }
+    } else if (twitch169Mode) {
+        twitchChangeRatioTimeout =
+            setTimeout(function () {
+                twitchSet169Mode(false)
+            }, 50);
+    }
+    $twitchPlayer.center();
+    $lsPlayer.hideLivestreamWatermark();
+    scrollIfTooLong();
+}
 
 function loadTwitch() {
     console.debug('loadTwitch');
@@ -580,14 +578,11 @@ function twitchSet169Mode(ratio169) {
     if (ratio169) {
         twitch169Mode = true;
         $twitchPlayer.height('134%');
-        $twitchPlayer.resize169();
-        $.cookie('hcb_twitch_169', 'true');
     }
     else {
         twitch169Mode = false;
         $twitchPlayer.height('100%');
         $twitchPlayer.css('top', 0);
-        $.cookie('hcb_twitch_169', 'false');
     }
-    $twitchPlayer.center();
+    windowResize()
 }
