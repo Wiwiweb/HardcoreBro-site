@@ -37,7 +37,14 @@ a:active {
     background-color: #000000;
 }
 
+#twitch-player {
+    height: 134%;
+    width: 100%;
+}
+
 #livestream-player {
+    height: 100%;
+    width: 100%;
     left: -150px;
 }
 

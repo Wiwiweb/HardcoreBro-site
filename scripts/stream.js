@@ -16,6 +16,7 @@ var rememberedVolume;
 var previousTitle = '';
 var currentPlayer;
 var currentTwitchChannel;
+var twitch169mode = true;
 
 var checkTwitchLoadedInterval;
 var reloadTwitchOnForbiddenTimeout;
@@ -41,7 +42,7 @@ var $channelDropdown;
 var $customTwitchTextbox;
 
 jQuery.fn.center = function () {
-    this.width(Math.min(this.height() * (4 / 3), this.parent().width()) + "px");
+    this.width(this.height() * (4 / 3) + "px");
     this.css('left',
         Math.max(0, (this.parent().width() - this.outerWidth()) / 2) + "px");
 };
@@ -49,6 +50,10 @@ jQuery.fn.center = function () {
 jQuery.fn.hideLivestreamWatermark = function () {
     var newWidth = this.parent().width() + 300;
     this.width(newWidth + "px");
+};
+
+jQuery.fn.resize169 = function () {
+    this.css('top', ((this.parent().height() - this.height()) / 2) + "px");
 };
 
 
@@ -104,6 +109,12 @@ $(document).ready(function () {
         channelDropdown(cookieDropdown);
     }
 
+    if(twitch169mode) {
+        $twitchPlayer.resize169();
+    } else {
+        twitchSwitchRatio();
+    }
+
 
     // Add events
     $volumeSlider.slider({
@@ -126,6 +137,9 @@ $(document).ready(function () {
     }
 
     $(window).resize(function () {
+        if (twitch169mode) {
+            $twitchPlayer.resize169();
+        }
         $twitchPlayer.center();
         $lsPlayer.hideLivestreamWatermark();
         scrollIfTooLong();
@@ -278,7 +292,7 @@ function scrollText() {
 function updateViewerCount(viewers) {
     console.debug('updateViewerCount: ' + viewers);
     var postText;
-    if(viewers == -1) {
+    if (viewers == -1) {
         viewers = '-';
         postText = "Bros"
     } else if (viewers == 1) {
@@ -536,4 +550,17 @@ function customTwitchPlayIfReal() {
             console.info(customTwitch + " doesn't exist");
         }
     });
+}
+
+function twitchSwitchRatio() {
+    if(twitch169mode) {
+        twitch169mode = false;
+        $twitchPlayer.height('100%');
+        $twitchPlayer.css('top', 0);
+    } else {
+        twitch169mode = true;
+        $twitchPlayer.height('134%');
+        $twitchPlayer.resize169();
+    }
+    $twitchPlayer.center();
 }
