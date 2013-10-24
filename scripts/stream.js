@@ -27,6 +27,7 @@ var switchIfTwitchLiveInterval;
 var twitchUpdateCallInterval;
 var scrollTextInterval = false;
 
+var $videoContainer;
 var $twitchPlayer;
 var $lsPlayer;
 var $playPauseButton;
@@ -42,9 +43,14 @@ var $channelDropdown;
 var $customTwitchTextbox;
 
 jQuery.fn.center = function () {
-    this.width(this.height() * (4 / 3) + "px");
-    this.css('left',
-        Math.max(0, (this.parent().width() - this.outerWidth()) / 2) + "px");
+    var newWidth = this.parent().height() * (1 + (twitch169Mode * .34)) * (4 / 3);
+    this.width(newWidth + "px");
+    this.css('left', ((this.parent().width() - newWidth) / 2) + "px");
+};
+
+jQuery.fn.resize169 = function () {
+    var newHeight = this.parent().height() * 1.34;
+    this.css('top', ((this.parent().height() - newHeight) / 2) + "px");
 };
 
 jQuery.fn.hideLivestreamWatermark = function () {
@@ -52,14 +58,11 @@ jQuery.fn.hideLivestreamWatermark = function () {
     this.width(newWidth + "px");
 };
 
-jQuery.fn.resize169 = function () {
-    this.css('top', ((this.parent().height() - this.height()) / 2) + "px");
-};
-
 
 $(document).ready(function () {
 
     // All jQuery selectors
+    $videoContainer = $('#video-container');
     $playPauseButton = $('#play-pause');
     $playPauseImage = $('#play-button-image');
     $volumeSlider = $("#volume-slider");
@@ -113,10 +116,12 @@ $(document).ready(function () {
 
     var cookieTwitch169 = $.cookie('hcb_twitch_169');
     console.info('Cookie hcb_twitch_169: ' + cookieTwitch169);
-    twitch169Mode = true;
     if (cookieTwitch169 == 'false') {
-        twitchSwitchRatio(); // Sets twitch169Mode to false
+        twitchSet169Mode(false);
     } else { // On undefined, default is true
+        // No need to call twitchSet169Mode because
+        // it's already on by default in the CSS
+        twitch169Mode = true;
         $twitchPlayer.resize169();
     }
 
@@ -142,8 +147,15 @@ $(document).ready(function () {
     }
 
     $(window).resize(function () {
-        if (twitch169Mode) {
-            $twitchPlayer.resize169();
+        console.debug('window resize');
+        if ($videoContainer.width() / $videoContainer.height() >= (16 / 9)) {
+            if (twitch169Mode) {
+                $twitchPlayer.resize169();
+            } else {
+                twitchSet169Mode(true);
+            }
+        } else if (twitch169Mode) {
+            twitchSet169Mode(false);
         }
         $twitchPlayer.center();
         $lsPlayer.hideLivestreamWatermark();
@@ -557,17 +569,25 @@ function customTwitchPlayIfReal() {
     });
 }
 
-function twitchSwitchRatio() {
-    if (twitch169Mode) {
-        twitch169Mode = false;
-        $twitchPlayer.height('100%');
-        $twitchPlayer.css('top', 0);
-        $.cookie('hcb_twitch_169', 'false');
-    } else {
+function twitchSet169Mode(ratio169) {
+    console.debug('twitchSet169Mode: ' + ratio169);
+    $twitchPlayer.css('-webkit-transition', '.2s');
+    $twitchPlayer.css('transition', '.2s');
+    setTimeout(function () {
+        $twitchPlayer.css('-webkit-transition', '0');
+        $twitchPlayer.css('transition', '0');
+    }, 200);
+    if (ratio169) {
         twitch169Mode = true;
         $twitchPlayer.height('134%');
         $twitchPlayer.resize169();
         $.cookie('hcb_twitch_169', 'true');
+    }
+    else {
+        twitch169Mode = false;
+        $twitchPlayer.height('100%');
+        $twitchPlayer.css('top', 0);
+        $.cookie('hcb_twitch_169', 'false');
     }
     $twitchPlayer.center();
 }
