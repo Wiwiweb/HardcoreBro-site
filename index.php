@@ -8,26 +8,11 @@
 	<meta name="description" content="Streaming video games with a funny accent.">
 	<meta name="keywords" content="video game live stream streaming feed hardcore bro">
 	<link rel="stylesheet" media="screen" type="text/css" title="Main" href="css/main.css" />
-	<link rel="icon" type="image/gif" href="../favicon.ico">
-	<script type="text/javascript" src="../scripts/index.js"></script>
+	<link rel="icon" type="image/x-icon" href="favicon.ico">
+	<script type="text/javascript"
+                src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+	<script type="text/javascript" src="scripts/main.js"></script>
 </head>
-
-<?php
-	$link = mysql_connect('mysql.hardcorebro.org', 'hardcorebro', '$www*tb=', false, MYSQL_CLIENT_INTERACTIVE);
-	if (!$link)
-		die('Could not connect: ' . mysql_error());
-	mysql_select_db('hardcore_bro', $link);
-
-
-	$stream = json_decode(file_get_contents("https://api.twitch.tv/kraken/streams/hardcore_bro"))->stream;
-	if (is_null($stream)) {
-		$isLive = false;
-	} else {
-		$isLive = true;
-		$game = $stream->channel->game;
-		$status = $stream->channel->status;
-	}
-?>
 
 <body>
 	<div class="logo">
@@ -49,30 +34,12 @@
 		?>
 	</div>
 
-	<?php
-		$data = fetchSingleMySQL("messages", "content", "name", "topMessage");
-		if ($data !== '') {
-	?>
-
-		<div id="message" class="dotted" onclick="hideContent('message')">
-			<?php
-				echo stripslashes((nl2br($data)));
-			?>
-			<p>
-				<small>Click to remove.</small>
-			</p>
-		</div>
-
-	<?php
-		}
-	?>
-
 	<div id="main-container">
 
-		<iframe id="player" frameborder="0" width="69%" height="600" src="stream.html"></iframe>
+		<iframe id="player" frameborder="0" width="69%" height="100%" src="stream.html"></iframe>
 
 		<iframe id="chat_embed" frameborder="0" src="http://twitch.tv/chat/embed?channel=hardcore_bro"
-		 width="29%" height="600"></iframe>
+		 width="29%" height="100%"></iframe>
 	</div>
 
 	<div class="box" style="width: 800px">
@@ -84,23 +51,3 @@
 </body>
 
 </html>
-
-
-<?php
-
-	function MySQLQuery($query)
-	{
-		$rep = mysql_query($query);
-		if (!$rep)
-			die('Could not do query: ' . mysql_error());
-		return $rep;
-	}
-
-	function fetchSingleMySQL($table, $column, $columnWhere, $value)
-	{
-		$query = "SELECT ".$column." FROM ".$table." WHERE " .$columnWhere. "='".$value."'";
-		$rep = MySQLQuery($query);
-		$data = mysql_fetch_array($rep);
-		return $data[0];
-	}
-?>
