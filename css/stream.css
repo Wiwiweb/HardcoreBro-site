@@ -35,6 +35,7 @@ a:active {
     bottom: 30px;
     width: 100%;
     background-color: #000000;
+    overflow: hidden;
 }
 
 #twitch-player {

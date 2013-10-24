@@ -135,7 +135,9 @@ $(document).ready(function () {
     }
 
     windowResize();
-    $(window).resize(windowResize);
+    var debouncedWindowResize = _.debounce(windowResize, 50);
+    $(window).resize(debouncedWindowResize);
+
 });
 
 function windowResize() {
