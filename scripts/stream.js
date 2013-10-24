@@ -16,7 +16,7 @@ var rememberedVolume;
 var previousTitle = '';
 var currentPlayer;
 var currentTwitchChannel;
-var twitch169mode = true;
+var twitch169Mode;
 
 var checkTwitchLoadedInterval;
 var reloadTwitchOnForbiddenTimeout;
@@ -78,11 +78,13 @@ $(document).ready(function () {
     $twitchPlayer.center();
     $lsPlayer.hideLivestreamWatermark();
 
-    //Cookies we use
-    //hcb_remembered_volume: 0-100 - 0 is none
-    //hcb_mute: true/false
-    //hcb_custom_twitch: remember text in custom box
-    //hcb_channel_dropdown: remember choice
+    // Cookies we use
+    // hcb_remembered_volume: 0-100 - 0 is none
+    // hcb_mute: true/false
+    // hcb_custom_twitch: remember text in custom box
+    // hcb_channel_dropdown: remember choice
+    // hcb_twitch_169: true/false
+
     var cookieVolume = $.cookie('hcb_remembered_volume');
     console.info('Cookie hcb_remembered_volume: ' + cookieVolume);
     if (typeof cookieVolume === 'undefined') {
@@ -109,10 +111,13 @@ $(document).ready(function () {
         channelDropdown(cookieDropdown);
     }
 
-    if(twitch169mode) {
+    var cookieTwitch169 = $.cookie('hcb_twitch_169');
+    console.info('Cookie hcb_twitch_169: ' + cookieTwitch169);
+    twitch169Mode = true;
+    if (cookieTwitch169 == 'false') {
+        twitchSwitchRatio(); // Sets twitch169Mode to false
+    } else { // On undefined, default is true
         $twitchPlayer.resize169();
-    } else {
-        twitchSwitchRatio();
     }
 
 
@@ -137,7 +142,7 @@ $(document).ready(function () {
     }
 
     $(window).resize(function () {
-        if (twitch169mode) {
+        if (twitch169Mode) {
             $twitchPlayer.resize169();
         }
         $twitchPlayer.center();
@@ -553,14 +558,16 @@ function customTwitchPlayIfReal() {
 }
 
 function twitchSwitchRatio() {
-    if(twitch169mode) {
-        twitch169mode = false;
+    if (twitch169Mode) {
+        twitch169Mode = false;
         $twitchPlayer.height('100%');
         $twitchPlayer.css('top', 0);
+        $.cookie('hcb_twitch_169', 'false');
     } else {
-        twitch169mode = true;
+        twitch169Mode = true;
         $twitchPlayer.height('134%');
         $twitchPlayer.resize169();
+        $.cookie('hcb_twitch_169', 'true');
     }
     $twitchPlayer.center();
 }
