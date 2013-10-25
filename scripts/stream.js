@@ -26,7 +26,6 @@ var updateLivestreamViewerCountInterval;
 var switchIfTwitchLiveInterval;
 var twitchUpdateCallInterval;
 var scrollTextInterval = false;
-var twitchChangeRatioTimeout;
 
 var $videoContainer;
 var $twitchPlayer;
@@ -142,21 +141,8 @@ $(document).ready(function () {
 
 function windowResize() {
     console.debug('windowResize');
-    clearTimeout(twitchChangeRatioTimeout);
-    if ($videoContainer.width() / $videoContainer.height() >= (16 / 9)) {
-        if (twitch169Mode) {
-            $twitchPlayer.resize169();
-        } else {
-            twitchChangeRatioTimeout =
-                setTimeout(function () {
-                    twitchSet169Mode(true)
-                }, 50);
-        }
-    } else if (twitch169Mode) {
-        twitchChangeRatioTimeout =
-            setTimeout(function () {
-                twitchSet169Mode(false)
-            }, 50);
+    if (twitch169Mode) {
+        $twitchPlayer.resize169();
     }
     $twitchPlayer.center();
     $lsPlayer.hideLivestreamWatermark();
@@ -580,11 +566,12 @@ function twitchSet169Mode(ratio169) {
     if (ratio169) {
         twitch169Mode = true;
         $twitchPlayer.height('134%');
+        $twitchPlayer.resize169();
     }
     else {
         twitch169Mode = false;
         $twitchPlayer.height('100%');
         $twitchPlayer.css('top', 0);
     }
-    windowResize()
+    $twitchPlayer.center();
 }

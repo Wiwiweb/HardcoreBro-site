@@ -2,6 +2,8 @@ var $mainContainer;
 var $player;
 var $chat;
 
+var isRatio169 = true;
+var playerWidthPercent = .69;
 var ratio = 16 / 9;
 
 var PLAYER_BAR_SIZE = 30;
@@ -9,7 +11,6 @@ var PLAYER_BAR_SIZE = 30;
 $(document).ready(function () {
     $mainContainer = $('#main-container');
     $player = $('#player');
-    $chat =
 
     resizePlayer();
     var debouncedPlayerResize = _.debounce(resizePlayer, 50);
@@ -18,20 +19,31 @@ $(document).ready(function () {
 
 function resizePlayer() {
     console.log('resizePlayer');
-    var newHeight = $player.width() * (1/ratio) + PLAYER_BAR_SIZE;
-    console.log(newHeight + "=" + $player.width() +"*"+ (1/ratio) +"+"+ PLAYER_BAR_SIZE);
+    var newPlayerWidth = $mainContainer.width() * playerWidthPercent;
+    console.debug(newPlayerWidth + " = " + $mainContainer.width() + " * " + playerWidthPercent);
+    var newHeight = newPlayerWidth * (1 / ratio) + PLAYER_BAR_SIZE;
+    console.debug(newHeight + " = " + newPlayerWidth + " * " + (1 / ratio) + " + " + PLAYER_BAR_SIZE);
     $mainContainer.height(newHeight);
 }
 
+function switchRatio() {
+    set169Mode(!isRatio169);
+}
+
 function set169Mode(ratio169) {
+    console.log('set169Mode');
     if (ratio169) {
         ratio = 16 / 9;
+        playerWidthPercent = .69;
         $player.width("69%");
         $chat.width("29%");
     } else {
         ratio = 4 / 3;
+        playerWidthPercent = .59;
         $player.width("59%");
         $chat.width("39%");
     }
+    $player.twitchSet169Mode(ratio169);
+    isRatio169 = ratio169;
     resizePlayer();
 }

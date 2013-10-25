@@ -55,6 +55,8 @@ div.box {
     margin: 10px auto;
     height: 600px;
     min-width: 800px;
+    -webkit-transition: .2s;
+    transition: .2s;
 }
 
 #player {
