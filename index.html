@@ -18,22 +18,12 @@
 
 <body>
 	<div class="logo">
-		<?php
-			$secret = rand(1, 100);
-			if ($secret > 5) {
-		?>
-			<img src="../images/banner.jpg" alt="Hardcore Bro" />
-		<?php
-			} else {
-		?>
-			<table cellspacing="0" cellpadding="0"><tr>
-				<td><img src="../images/blingee1.gif" /></td>
-				<td><img src="../images/blingee2.gif" alt="Hardcore Bro" /></td>
-				<td><img src="../images/blingee3.gif" /></td>
-			</tr></table>
-		<?php
-			}
-		?>
+        <img id="normal-banner" src="../images/banner.jpg" alt="Hardcore Bro" />
+        <table id="blingee-banner" cellspacing="0" cellpadding="0" style="display: none;"><tr>
+            <td><img src="../images/blingee1.gif" /></td>
+            <td><img src="../images/blingee2.gif" alt="Hardcore Bro" /></td>
+            <td><img src="../images/blingee3.gif" /></td>
+        </tr></table>
 	</div>
 
 	<div id="main-container">

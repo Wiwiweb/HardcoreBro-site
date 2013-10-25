@@ -12,6 +12,11 @@ $(document).ready(function () {
     $mainContainer = $('#main-container');
     $player = $('#player');
 
+    if(Math.random() <= 0.05) {
+        $('#normal-banner').hide();
+        $('#blingee-banner').show();
+    }
+
     resizePlayer();
     var debouncedPlayerResize = _.debounce(resizePlayer, 50);
     $(window).resize(debouncedPlayerResize);
