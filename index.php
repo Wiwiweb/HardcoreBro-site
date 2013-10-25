@@ -10,7 +10,9 @@
 	<link rel="stylesheet" media="screen" type="text/css" title="Main" href="css/main.css" />
 	<link rel="icon" type="image/x-icon" href="favicon.ico">
 	<script type="text/javascript"
-                src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+                src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.3.1/jquery.cookie.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
 	<script type="text/javascript" src="scripts/main.js"></script>
 </head>
 
@@ -36,10 +38,9 @@
 
 	<div id="main-container">
 
-		<iframe id="player" frameborder="0" width="69%" height="100%" src="stream.html"></iframe>
+		<iframe id="player" frameborder="0" src="stream.html"></iframe>
 
-		<iframe id="chat_embed" frameborder="0" src="http://twitch.tv/chat/embed?channel=hardcore_bro"
-		 width="29%" height="100%"></iframe>
+		<iframe id="chat" frameborder="0" src="http://twitch.tv/chat/embed?channel=hardcore_bro&popout_chat=true"></iframe>
 	</div>
 
 	<div class="box" style="width: 800px">

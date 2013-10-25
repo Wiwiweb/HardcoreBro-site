@@ -57,15 +57,16 @@ div.box {
     min-width: 800px;
 }
 
-div.dotted{
-    margin: 20px auto;
-    width: 600px;
-    border: 1px dotted #FF0000;
-    padding:10px 5px 5px 5px;
-    font-size: 12px;
-    color:white;
-    text-align: center;
+#player {
+    width: 69%;
+    height: 100%;
 }
+
+#chat {
+    width: 29%;
+    height: 100%;
+}
+
 
 div.footer {
     margin: 0 20px;
