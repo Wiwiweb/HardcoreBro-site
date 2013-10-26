@@ -1,9 +1,8 @@
 body {
     background: black;
-    margin: 0;
+    margin: 0 20px;
     padding: 0;
     color: white;
-    text-align: center;
 }
 
 table {
@@ -49,14 +48,14 @@ div.box {
     border: 1px solid #ffffff;
     width: 90%;
     padding: 5px;
+    text-align: center;
 }
 
 #main-container {
-    margin: 10px auto;
     height: 600px;
     min-width: 800px;
-    -webkit-transition: .2s;
-    transition: .2s;
+    /*-webkit-transition: .2s;*/
+    /*transition: .2s;*/
 }
 
 #player {
@@ -69,6 +68,9 @@ div.box {
     height: 100%;
 }
 
+#ratio-change {
+    cursor: pointer;
+}
 
 div.footer {
     margin: 0 20px;
