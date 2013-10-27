@@ -89,7 +89,7 @@ $(document).ready(function () {
 
     var cookieVolume = $.cookie('hcb_remembered_volume');
     console.info('Cookie hcb_remembered_volume: ' + cookieVolume);
-    if (typeof cookieVolume === 'undefined') {
+    if (typeof cookieVolume === 'undefined' || cookieVolume === null) {
         cookieVolume = defaultVolume;
     }
     rememberedVolume = cookieVolume;
@@ -102,13 +102,13 @@ $(document).ready(function () {
 
     var cookieCustomTwitch = $.cookie('hcb_custom_twitch');
     console.info('Cookie hcb_custom_twitch: ' + cookieCustomTwitch);
-    if (typeof cookieCustomTwitch !== 'undefined') {
+    if (typeof cookieCustomTwitch !== 'undefined' && cookieCustomTwitch !== null) {
         $customTwitchTextbox.val(cookieCustomTwitch);
     }
 
     var cookieDropdown = $.cookie('hcb_channel_dropdown');
     console.info('Cookie hcb_channel_dropdown: ' + cookieDropdown);
-    if (typeof cookieDropdown !== 'undefined') {
+    if (typeof cookieDropdown !== 'undefined' && cookieDropdown !== null) {
         $channelDropdown.val(cookieDropdown);
         channelDropdown(cookieDropdown);
     }
@@ -548,7 +548,7 @@ function customTwitchPlayIfReal() {
             console.info(customTwitch + " exists, switching");
             currentTwitchChannel = customTwitch;
             twitchChangeChannel();
-            $.cookie('hcb_custom_twitch', customTwitch)
+            $.cookie('hcb_custom_twitch', customTwitch, {expires: 7});
         } else {
             console.info(customTwitch + " doesn't exist");
         }
