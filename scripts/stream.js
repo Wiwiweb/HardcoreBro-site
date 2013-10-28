@@ -261,8 +261,8 @@ function updateLivestreamTitle() {
     if (text != null && text != previousTitle) {
         console.info("Update Livestream title: " + text);
         previousTitle = text;
-        text = '<a href="http://www.google.com/search?q='
-            + encodeURIComponent(text) + '&btnI">'
+        text = '<a href="http://www.google.com/webhp#q='
+            + encodeURIComponent('site:youtube.com "' + text + '"') + '&btnI">'
             + text +
             '</a>';
         $titleTextSpan.html(text);
