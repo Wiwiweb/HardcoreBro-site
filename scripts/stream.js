@@ -81,6 +81,7 @@ $(document).ready(function () {
     $twitchPlayer.center();
     $lsPlayer.hideLivestreamWatermark();
 
+
     // Cookies we use
     // hcb_remembered_volume: 0-100 - 0 is none
     // hcb_mute: true/false
@@ -99,18 +100,38 @@ $(document).ready(function () {
     if (cookieMute == 'true') {
         initialVolume = 0;
     }
-
     var cookieCustomTwitch = $.cookie('hcb_custom_twitch');
     console.info('Cookie hcb_custom_twitch: ' + cookieCustomTwitch);
     if (typeof cookieCustomTwitch !== 'undefined' && cookieCustomTwitch !== null) {
         $customTwitchTextbox.val(cookieCustomTwitch);
     }
 
-    var cookieDropdown = $.cookie('hcb_channel_dropdown');
-    console.info('Cookie hcb_channel_dropdown: ' + cookieDropdown);
-    if (typeof cookieDropdown !== 'undefined' && cookieDropdown !== null) {
-        $channelDropdown.val(cookieDropdown);
-        channelDropdown(cookieDropdown);
+    // If we have any URL parameter, use it
+    // Otherwise, use cookies
+    var urlParams = getUrlParameters();
+    console.log('urlParams: ', urlParams);
+    if ('main' in urlParams) {
+        $channelDropdown.val('twitch1');
+        channelDropdown('twitch1');
+    } else if ('movie' in urlParams) {
+        $channelDropdown.val('twitch2');
+        channelDropdown('twitch2');
+    } else if ('custom' in urlParams) {
+        $channelDropdown.val('twitch-custom');
+        channelDropdown('twitch-custom');
+        if(urlParams['custom'].length > 0) {
+            $customTwitchTextbox.val(urlParams['custom']);
+        }
+    } else if ('autoplay' in urlParams) {
+        $channelDropdown.val('livestream');
+        channelDropdown('livestream');
+    } else {
+        var cookieDropdown = $.cookie('hcb_channel_dropdown');
+        console.info('Cookie hcb_channel_dropdown: ' + cookieDropdown);
+        if (typeof cookieDropdown !== 'undefined' && cookieDropdown !== null) {
+            $channelDropdown.val(cookieDropdown);
+            channelDropdown(cookieDropdown);
+        }
     }
 
     // Add events
