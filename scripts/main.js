@@ -17,9 +17,14 @@ $(document).ready(function () {
 
     $ratioChangeButton.click(switchRatio);
 
-    if(Math.random() <= 0.05) {
+    if (Math.random() <= 0.05) {
         $('#normal-banner').hide();
         $('#blingee-banner').show();
+    }
+
+    var queryString = window.location.search;
+    if (queryString != '') {
+        $player.attr('src', 'stream.html' + queryString);
     }
 
     resizePlayer();
@@ -27,9 +32,8 @@ $(document).ready(function () {
     $(window).resize(debouncedPlayerResize);
 });
 
-$(window).load(function() {
-    player.$channelDropdown.change(function() {
-        console.debug("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+$(window).load(function () {
+    player.$channelDropdown.change(function () {
         switch (player.$channelDropdown.val()) {
             case 'twitch1':
             case 'twitch2':
