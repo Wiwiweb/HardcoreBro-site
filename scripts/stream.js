@@ -13,7 +13,7 @@ var twitchUpdateCallFrequency = 5000;
 var rememberedVolume;
 var previousTitle = '';
 var currentPlayer;
-var currentTwitchChannel;
+var currentTwitchChannel = '';
 var autoswitch = true;
 var paused = false;
 var twitch169Mode = true;
@@ -118,10 +118,10 @@ $(document).ready(function () {
         channelDropdown('twitch2');
     } else if ('custom' in urlParams) {
         $channelDropdown.val('twitch-custom');
-        channelDropdown('twitch-custom');
         if(urlParams['custom'].length > 0) {
             $customTwitchTextbox.val(urlParams['custom']);
         }
+        channelDropdown('twitch-custom');
     } else if ('autoplay' in urlParams) {
         $channelDropdown.val('livestream');
         channelDropdown('livestream');
@@ -572,6 +572,10 @@ function customTwitchPlayIfReal() {
             $.cookie('hcb_custom_twitch', customTwitch, {expires: 7});
         } else {
             console.info(customTwitch + " doesn't exist");
+            console.info('currentTwitchChannel', currentTwitchChannel);
+            if(currentTwitchChannel == '') {
+                $titleTextSpan.text("Invalid channel");
+            }
         }
     });
 }
