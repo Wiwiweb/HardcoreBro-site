@@ -109,7 +109,7 @@ $(document).ready(function () {
     // If we have any URL parameter, use it
     // Otherwise, use cookies
     var urlParams = getUrlParameters();
-    console.log('urlParams: ', urlParams);
+    console.info('urlParams: ', urlParams);
     if ('main' in urlParams) {
         $channelDropdown.val('twitch1');
         channelDropdown('twitch1');
@@ -118,7 +118,7 @@ $(document).ready(function () {
         channelDropdown('twitch2');
     } else if ('custom' in urlParams) {
         $channelDropdown.val('twitch-custom');
-        if(urlParams['custom'].length > 0) {
+        if (urlParams['custom'].length > 0) {
             $customTwitchTextbox.val(urlParams['custom']);
         }
         channelDropdown('twitch-custom');
@@ -336,7 +336,7 @@ function updateViewerCount(viewers) {
 }
 
 function twitchChangeChannel() {
-    console.debug("twitchChangeChannel: " + currentTwitchChannel);
+    console.debug('twitchChangeChannel: ' + currentTwitchChannel);
     if (currentPlayer == 'twitch') {
         twitchUpdateCall();
         // Need to pause play because of a justin tv bug
@@ -349,8 +349,9 @@ function twitchChangeChannel() {
 }
 
 function changePlayer(player) {
-    console.debug("changePlayer: " + player);
+    console.debug('changePlayer: ' + player);
     if (player != currentPlayer) {
+        console.debug("Not currently on " + player + " changing");
         currentPlayer = player;
         clearInterval(checkTwitchLoadedInterval);
         switch (player) {
@@ -394,6 +395,7 @@ function twitchUpdateCall() {
     $.getJSON('https://api.twitch.tv/kraken/streams/' + currentTwitchChannel +
         '?callback=?', function (data) {
         var text;
+        console.debug(data);
         if (data.stream) {
             // Twitch is live, update text and viewercount
             text = data.stream.channel.status;
@@ -573,7 +575,7 @@ function customTwitchPlayIfReal() {
         } else {
             console.info(customTwitch + " doesn't exist");
             console.info('currentTwitchChannel', currentTwitchChannel);
-            if(currentTwitchChannel == '') {
+            if (currentTwitchChannel == '') {
                 $titleTextSpan.text("Invalid channel");
             }
         }
