@@ -5,9 +5,12 @@ var $ratioChangeButton;
 
 var isRatio169 = true;
 var playerWidthPercent = .69;
+var chatWidthPercent = .30;
 var ratio = 16 / 9;
 
 var PLAYER_BAR_SIZE = 30;
+var TWITCH_CHAT_MIN_WIDTH = 300;
+var PLAYER_CHAT_SPACER = 5;
 
 $(document).ready(function () {
     $mainContainer = $('#main-container');
@@ -49,11 +52,19 @@ $(window).load(function () {
 
 function resizePlayer() {
     console.log('resizePlayer');
-    var newPlayerWidth = $mainContainer.width() * playerWidthPercent;
-    console.debug(newPlayerWidth + " = " + $mainContainer.width() + " * " + playerWidthPercent);
+    var mainWidth = $mainContainer.width();
+    var newPlayerWidth =
+        Math.min(mainWidth * playerWidthPercent,
+                 mainWidth - TWITCH_CHAT_MIN_WIDTH - PLAYER_CHAT_SPACER);
+    var newChatWidth =
+        Math.max(mainWidth * chatWidthPercent,
+                 TWITCH_CHAT_MIN_WIDTH);
+    $player.width(newPlayerWidth);
+    $chat.width(newChatWidth);
     var newHeight = newPlayerWidth * (1 / ratio) + PLAYER_BAR_SIZE;
-    console.debug(newHeight + " = " + newPlayerWidth + " * " + (1 / ratio) + " + " + PLAYER_BAR_SIZE);
     $mainContainer.height(newHeight);
+//    console.debug(newPlayerWidth + " = " + $mainContainer.width() + " * " + playerWidthPercent);
+//    console.debug(newHeight + " = " + newPlayerWidth + " * " + (1 / ratio) + " + " + PLAYER_BAR_SIZE);
 }
 
 function switchRatio() {
@@ -64,15 +75,13 @@ function set169Mode(ratio169) {
     console.log('set169Mode');
     if (ratio169) {
         ratio = 16 / 9;
-        playerWidthPercent = .69;
-        $player.width("69%");
-        $chat.width("29%");
+        playerWidthPercent = .70;
+        chatWidthPercent = .30;
         $ratioChangeButton.text("Change to 4:3 mode");
     } else {
         ratio = 4 / 3;
-        playerWidthPercent = .59;
-        $player.width("59%");
-        $chat.width("39%");
+        playerWidthPercent = .70;
+        chatWidthPercent = .40;
         $ratioChangeButton.text("Change to 16:9 mode");
     }
     player.twitchSet169Mode(ratio169);

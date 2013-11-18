@@ -36,7 +36,6 @@ a:active {
 div {
     margin: auto;
     padding: 0;
-
 }
 
 div.logo {
@@ -54,6 +53,7 @@ div.box {
 #main-container {
     height: 600px;
     min-width: 800px;
+    min-height: 335px;
     /*-webkit-transition: .2s;*/
     /*transition: .2s;*/
 }
@@ -64,7 +64,7 @@ div.box {
 }
 
 #chat {
-    width: 29%;
+    width: 30%;
     height: 100%;
 }
 
