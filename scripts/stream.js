@@ -1,5 +1,5 @@
 var twitchMainChannel = 'hardcore_bro';
-var twitchSecondaryChannel = 'darianHCB';
+var twitchSecondaryChannel = 'shlomgoldberg';
 var twitchQuality = 'live';
 var livestreamChannel = 'hardcore_bro';
 var defaultVolume = 50;
