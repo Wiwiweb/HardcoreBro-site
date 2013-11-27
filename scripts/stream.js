@@ -395,7 +395,7 @@ function twitchUpdateCall() {
     $.getJSON('https://api.twitch.tv/kraken/streams/' + currentTwitchChannel +
         '?callback=?', function (data) {
         var text;
-        console.debug(data);
+        console.debug('twitchUpdateCall returned :', data);
         if (data.stream) {
             // Twitch is live, update text and viewercount
             text = data.stream.channel.status;
@@ -496,7 +496,7 @@ function mute() {
         volume = rememberedVolume;
         $.cookie('hcb_mute', 'false');
     } else {
-        volume = 0
+        volume = 0;
         $.cookie('hcb_mute', 'true');
     }
     changeVolume(volume);
