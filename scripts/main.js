@@ -5,12 +5,12 @@ var $ratioChangeButton;
 
 var isRatio169 = true;
 var playerWidthPercent = .69;
-var chatWidthPercent = .30;
+var chatWidthPercent = .29;
 var ratio = 16 / 9;
 
 var PLAYER_BAR_SIZE = 30;
 var TWITCH_CHAT_MIN_WIDTH = 300;
-var PLAYER_CHAT_SPACER = 5;
+var PLAYER_CHAT_SPACER = 15;
 
 $(document).ready(function () {
     $mainContainer = $('#main-container');
@@ -32,7 +32,7 @@ $(document).ready(function () {
 
     resizePlayer();
     var debouncedPlayerResize = _.debounce(resizePlayer, 50);
-    $(window).resize(debouncedPlayerResize);
+    $(window).resize(resizePlayer);
 });
 
 $(window).load(function () {
@@ -53,16 +53,21 @@ $(window).load(function () {
 function resizePlayer() {
     console.log('resizePlayer');
     var mainWidth = $mainContainer.width();
+    console.debug("resizePlayer: mainWidth:", mainWidth);
+    console.debug("resizePlayer: playerWidthPercent:", playerWidthPercent);
     var newPlayerWidth =
-        Math.min(mainWidth * playerWidthPercent,
+        Math.min(mainWidth * playerWidthPercent - PLAYER_CHAT_SPACER,
                  mainWidth - TWITCH_CHAT_MIN_WIDTH - PLAYER_CHAT_SPACER);
+    console.debug("resizePlayer: newPlayerWidth:", newPlayerWidth);
     var newChatWidth =
         Math.max(mainWidth * chatWidthPercent,
                  TWITCH_CHAT_MIN_WIDTH);
+    console.debug("resizePlayer: newChatWidth:", newChatWidth);
     $player.width(newPlayerWidth);
     $chat.width(newChatWidth);
     var newHeight = newPlayerWidth * (1 / ratio) + PLAYER_BAR_SIZE;
     $mainContainer.height(newHeight);
+    console.debug("resizePlayer: newHeight:", newHeight);
 //    console.debug(newPlayerWidth + " = " + $mainContainer.width() + " * " + playerWidthPercent);
 //    console.debug(newHeight + " = " + newPlayerWidth + " * " + (1 / ratio) + " + " + PLAYER_BAR_SIZE);
 }
@@ -75,13 +80,13 @@ function set169Mode(ratio169) {
     console.log('set169Mode');
     if (ratio169) {
         ratio = 16 / 9;
-        playerWidthPercent = .70;
-        chatWidthPercent = .30;
+        playerWidthPercent = .69;
+        chatWidthPercent = .29;
         $ratioChangeButton.text("Change to 4:3 mode");
     } else {
         ratio = 4 / 3;
-        playerWidthPercent = .70;
-        chatWidthPercent = .40;
+        playerWidthPercent = .59;
+        chatWidthPercent = .39;
         $ratioChangeButton.text("Change to 16:9 mode");
     }
     player.twitchSet169Mode(ratio169);
