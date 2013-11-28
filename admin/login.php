@@ -17,7 +17,7 @@
 <body>
 <div id="login-container">
     <p>Login:</p>
-    <form action="process_login.php" method="post" id="login-form">
+    <form action="php/process-login.php" method="post" id="login-form">
        <label for="username">Username:</label>
           <input type="text" name="username" id="username" /><br />
        <label for="password">Password:</label>

@@ -1,6 +1,5 @@
 <?php
-include 'database_connect.php';
-session_start();
+include 'database-connect.php';
 
 if (isset($_POST['username'], $_POST['hashed_pass'])) {
     $username = $_POST['username'];
@@ -8,14 +7,14 @@ if (isset($_POST['username'], $_POST['hashed_pass'])) {
 
     $login = login($username, $password, $mysqli);
     if ($login == "valid") {
-        header('Location: ./');
+        header('Location: ../');
     } else {
         // Login failed
-        header('Location: ./login.php?error=' . $login);
+        header('Location: ../login.php?error=' . $login);
     }
 } else {
     // The correct POST variables were not sent to this page.
-    header('Location: ./login.php?error=invalid_request');
+    header('Location: ../login.php?error=invalid_request');
 }
 
 

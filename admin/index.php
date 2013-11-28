@@ -1,6 +1,6 @@
 <?php
-include 'php/database_connect.php';
-include 'php/login_check.php';
+include 'php/database-connect.php';
+include 'php/login-check.php';
 session_start();
 
 if (login_check($mysqli) == true) {
@@ -27,6 +27,6 @@ if (login_check($mysqli) == true) {
 
 <?php
 } else {
-    echo('Location: ./login.php?error=not_logged_in');
+    header('Location: ./login.php?error=not_logged_in');
 }
 ?>
