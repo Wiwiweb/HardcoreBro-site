@@ -1,7 +1,6 @@
 <?php
 include 'php/database-connect.php';
 include 'php/login-check.php';
-session_start();
 
 if (login_check($mysqli) == true) {
 ?>
