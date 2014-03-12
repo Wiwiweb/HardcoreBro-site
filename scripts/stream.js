@@ -42,17 +42,6 @@ var $rightSide;
 var $channelDropdown;
 var $customTwitchTextbox;
 
-jQuery.fn.center = function () {
-    var newWidth = this.parent().height() * (1 + (twitch169Mode * .34)) * (4 / 3);
-    this.width(newWidth + "px");
-    this.css('left', ((this.parent().width() - newWidth) / 2) + "px");
-};
-
-jQuery.fn.resize169 = function () {
-    var newHeight = this.parent().height() * 1.34;
-    this.css('top', ((this.parent().height() - newHeight) / 2) + "px");
-};
-
 jQuery.fn.hideLivestreamWatermark = function () {
     var newWidth = this.parent().width() + 300;
     this.width(newWidth + "px");
@@ -78,7 +67,6 @@ $(document).ready(function () {
     $lsPlayer = $("#livestream-player");
 
     // jQuery resizing
-    $twitchPlayer.center();
     $lsPlayer.hideLivestreamWatermark();
 
 
@@ -162,10 +150,6 @@ $(document).ready(function () {
 
 function windowResize() {
     console.debug('windowResize');
-    if (twitch169Mode) {
-        $twitchPlayer.resize169();
-    }
-    $twitchPlayer.center();
     $lsPlayer.hideLivestreamWatermark();
     scrollIfTooLong();
 }
@@ -177,30 +161,12 @@ function loadTwitch() {
     clearInterval(updateLivestreamTitleInterval);
     clearInterval(updateLivestreamViewerCountInterval);
     clearInterval(switchIfTwitchLiveInterval);
-    checkTwitchLoadedInterval =
-        setInterval(checkTwitchLoaded, checkTwitchLoadedFrequency);
-    reloadTwitchOnForbiddenTimeout = setTimeout(reloadTwitch, 5000);
 }
 
-function checkTwitchLoaded() {
-    console.debug('twitch PercentLoaded: ' + $twitchPlayer[0].PercentLoaded());
-    if ($twitchPlayer[0].PercentLoaded() == 100) {
-        twitchInit();
-        clearInterval(checkTwitchLoadedInterval);
-        clearTimeout(reloadTwitchOnForbiddenTimeout);
-    }
-}
-
-function reloadTwitch() {
-    console.debug('reloadTwitch');
-    $twitchPlayer.hide();
-    $twitchPlayer.show();
-}
-
+// Called by $twitchPlayer callback
 function twitchInit() {
     console.debug('twitchInit');
     play();
-    $twitchPlayer[0].change_volume($volumeSlider.slider('value'));
     twitchUpdateCall();
     twitchUpdateCallInterval =
         setInterval(twitchUpdateCall, twitchUpdateCallFrequency);
@@ -234,16 +200,6 @@ function turnAutoswitchOff() {
     console.debug('turnAutoswitchOff');
     autoswitch = false;
     clearInterval(switchIfTwitchLiveInterval);
-}
-
-function twitchCallback(e, info) {
-    console.debug('twitchCallback: ' + e);
-    if (e == 'video_not_found' && autoswitch) {
-        setTimeout(switchIfTwitchLive, 3000);
-    }
-    else if (e == 'stream_viewer_count') {
-        updateViewerCount(info.stream.toString());
-    }
 }
 
 function livestreamInit() {
@@ -339,9 +295,6 @@ function twitchChangeChannel() {
     console.debug('twitchChangeChannel: ' + currentTwitchChannel);
     if (currentPlayer == 'twitch') {
         twitchUpdateCall();
-        // Need to pause play because of a justin tv bug
-        // while switching from live to non-live
-        pause();
         play();
     } else {
         changePlayer('twitch');
@@ -436,8 +389,10 @@ function twitchUpdateCall() {
 function play() {
     console.debug('play');
     paused = false;
+
     if (currentPlayer == 'twitch') {
-        $twitchPlayer[0].play_live(currentTwitchChannel, twitchQuality)
+        $twitchPlayer[0].loadStream(currentTwitchChannel);
+        $twitchPlayer[0].playVideo();
     } else {
         $lsPlayer[0].startPlayback();
     }
@@ -450,7 +405,7 @@ function pause() {
     console.debug('pause');
     paused = true;
     if (currentPlayer == 'twitch') {
-        $twitchPlayer[0].pause_video()
+        $twitchPlayer[0].pauseVideo()
     } else {
         $lsPlayer[0].stopPlayback()
     }
@@ -467,7 +422,12 @@ function volumeSlider(event, ui) {
 function changeVolume(volume) {
     console.debug('changeVolume: ' + volume);
     if (currentPlayer == 'twitch') {
-        $twitchPlayer[0].change_volume(volume)
+        if(volume == 0) {
+            $twitchPlayer[0].mute();
+        } else {
+            volume = 100;
+            $twitchPlayer[0].unmute();
+        }
     } else {
         $lsPlayer[0].setVolume(volume / 100)
     }
@@ -580,25 +540,4 @@ function customTwitchPlayIfReal() {
             }
         }
     });
-}
-
-function twitchSet169Mode(ratio169) {
-    console.debug('twitchSet169Mode: ' + ratio169);
-    $twitchPlayer.css('-webkit-transition', '.2s');
-    $twitchPlayer.css('transition', '.2s');
-    setTimeout(function () {
-        $twitchPlayer.css('-webkit-transition', '0');
-        $twitchPlayer.css('transition', '0');
-    }, 200);
-    if (ratio169) {
-        twitch169Mode = true;
-        $twitchPlayer.height('134%');
-        $twitchPlayer.resize169();
-    }
-    else {
-        twitch169Mode = false;
-        $twitchPlayer.height('100%');
-        $twitchPlayer.css('top', 0);
-    }
-    $twitchPlayer.center();
 }

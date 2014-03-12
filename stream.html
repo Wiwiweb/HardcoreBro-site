@@ -10,17 +10,19 @@
             src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script type="text/javascript"
             src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.3.1/jquery.cookie.min.js"></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+    <script type="text/javascript"
+            src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.3.1/jquery.cookie.min.js"></script>
+    <script type="text/javascript"
+            src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
     <script type="text/javascript" src="scripts/stream.js"></script>
     <script type="text/javascript" src="scripts/url-parameters.js"></script>
-    <base target="_blank" />
+    <base target="_blank"/>
 </head>
 <body>
 
 <div id="video-container">
     <object type="application/x-shockwave-flash" id="twitch-player"
-            data="http://www.justin.tv/widgets/live_api_player.swf"
+            data="http://www-cdn.jtvnw.net/swflibs/TwitchPlayer.swf"
             bgcolor="#000000"
             style="display: none;">
         <param name="allowFullScreen" value="true">
@@ -28,7 +30,7 @@
         <param name="movie"
                value="http://www.justin.tv/widgets/live_api_player.swf">
         <param name="flashvars"
-               value="enable_javascript=true&amp;javascript_callback_path=twitchCallback&amp;consumer_key=54VEwlMeAQHLgYk1wMbcTw">
+               value="initCallback=twitchInit">
     </object>
     <object type="application/x-shockwave-flash" id="livestream-player"
             data="http://cdn.livestream.com/chromelessPlayer/v20/playerapi.swf"
@@ -62,7 +64,7 @@
             <option value="twitch-custom">Custom Twitch Channel</option>
             <option value="livestream">Livestream (Autoplay)</option>
         </select>
-       <input id="custom-twitch-textbox" type="text" style="display: none;"/>
+        <input id="custom-twitch-textbox" type="text" style="display: none;"/>
     </div>
 </div>
 
