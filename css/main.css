@@ -53,14 +53,14 @@ div.box {
 #main-container {
     height: 600px;
     min-width: 800px;
-    min-height: 335px;
-    /*-webkit-transition: .2s;*/
-    /*transition: .2s;*/
+    overflow: hidden;
 }
 
 #player {
     width: 69%;
     height: 100%;
+    -webkit-transition: .2s;
+    transition: .2s;
 }
 
 #chat {
@@ -68,6 +68,8 @@ div.box {
     height: 100%;
     float: right;
     overflow: hidden;
+    -webkit-transition: .2s;
+    transition: .2s;
 }
 
 #ratio-change {

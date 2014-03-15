@@ -31,7 +31,6 @@ $(document).ready(function () {
     }
 
     resizePlayer();
-    var debouncedPlayerResize = _.debounce(resizePlayer, 50);
     $(window).resize(resizePlayer);
 });
 
@@ -53,23 +52,14 @@ $(window).load(function () {
 function resizePlayer() {
     console.log('resizePlayer');
     var mainWidth = $mainContainer.width();
-    console.debug("resizePlayer: mainWidth:", mainWidth);
-    console.debug("resizePlayer: playerWidthPercent:", playerWidthPercent);
-    var newPlayerWidth =
-        Math.min(mainWidth * playerWidthPercent - PLAYER_CHAT_SPACER,
-                 mainWidth - TWITCH_CHAT_MIN_WIDTH - PLAYER_CHAT_SPACER);
+    var mainHeight = $mainContainer.height();
+    var playerHeight = mainHeight - PLAYER_BAR_SIZE;
+    var newPlayerWidth = playerHeight * ratio;
+    var newChatWidth = mainWidth - newPlayerWidth - 10;
     console.debug("resizePlayer: newPlayerWidth:", newPlayerWidth);
-    var newChatWidth =
-        Math.max(mainWidth * chatWidthPercent,
-                 TWITCH_CHAT_MIN_WIDTH);
     console.debug("resizePlayer: newChatWidth:", newChatWidth);
     $player.width(newPlayerWidth);
     $chat.width(newChatWidth);
-    var newHeight = newPlayerWidth * (1 / ratio) + PLAYER_BAR_SIZE;
-    $mainContainer.height(newHeight);
-    console.debug("resizePlayer: newHeight:", newHeight);
-//    console.debug(newPlayerWidth + " = " + $mainContainer.width() + " * " + playerWidthPercent);
-//    console.debug(newHeight + " = " + newPlayerWidth + " * " + (1 / ratio) + " + " + PLAYER_BAR_SIZE);
 }
 
 function switchRatio() {
@@ -80,16 +70,11 @@ function set169Mode(ratio169) {
     console.log('set169Mode');
     if (ratio169) {
         ratio = 16 / 9;
-        playerWidthPercent = .69;
-        chatWidthPercent = .29;
         $ratioChangeButton.text("Change to 4:3 mode");
     } else {
         ratio = 4 / 3;
-        playerWidthPercent = .59;
-        chatWidthPercent = .39;
         $ratioChangeButton.text("Change to 16:9 mode");
     }
-    player.twitchSet169Mode(ratio169);
     isRatio169 = ratio169;
     resizePlayer();
 }

@@ -16,7 +16,6 @@ var currentPlayer;
 var currentTwitchChannel = '';
 var autoswitch = true;
 var paused = false;
-var twitch169Mode = true;
 
 var checkTwitchLoadedInterval;
 var reloadTwitchOnForbiddenTimeout;
