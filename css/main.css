@@ -86,3 +86,7 @@ div.footer {
 #options {
     color: grey;
 }
+
+#options a {
+    color: grey;
+}

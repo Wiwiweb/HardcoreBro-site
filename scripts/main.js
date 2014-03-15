@@ -78,3 +78,11 @@ function set169Mode(ratio169) {
     isRatio169 = ratio169;
     resizePlayer();
 }
+
+function popoutStream() {
+    window.open("stream.html", "HCB Stream", "height=600, width=1066");
+}
+
+function popoutChat() {
+    window.open("http://www.twitch.tv/chat/embed?channel=hardcore_bro&popout_chat=true", "HCB Chat", "height=800, width=400");
+}
