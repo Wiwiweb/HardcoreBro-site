@@ -160,6 +160,17 @@ function loadTwitch() {
     clearInterval(updateLivestreamTitleInterval);
     clearInterval(updateLivestreamViewerCountInterval);
     clearInterval(switchIfTwitchLiveInterval);
+    checkTwitchLoadedInterval =
+        setInterval(checkTwitchLoaded, checkTwitchLoadedFrequency);
+}
+
+function checkTwitchLoaded() {
+    console.debug('twitch PercentLoaded: ' + $twitchPlayer[0].PercentLoaded());
+    if ($twitchPlayer[0].PercentLoaded() == 100) {
+        twitchInit();
+        clearInterval(checkTwitchLoadedInterval);
+        clearTimeout(reloadTwitchOnForbiddenTimeout);
+    }
 }
 
 // Called by $twitchPlayer callback
