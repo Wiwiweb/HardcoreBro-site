@@ -99,9 +99,13 @@ function createSteamComment($row)
     #8 Jun @ 6:52
 
     $text = strip_tags($row['text']);
+    $linkPattern = '/([a-z]+\:\/\/[a-z0-9\-\.]+\.[a-z]+(:[a-z0-9]*)?\/?([a-z0-9\-\._\:\?\,\'\/\\\+&%\$#\=~])*[^\.\,\)\(\s])/i';
+    $linkReplace = '<a href="$1">$1</a>';
+    $text = preg_replace($linkPattern, $linkReplace, $text);
+
     $emoticonPattern = '/:(\w+):/';
-    $replacementPattern = "<img src=\"http://cdn.steamcommunity.com/economy/emoticon/$1\">";
-    $text = preg_replace($emoticonPattern, $replacementPattern, $text);
+    $emoticonReplace = '<img src="http://cdn.steamcommunity.com/economy/emoticon/$1">';
+    $text = preg_replace($emoticonPattern, $emoticonReplace, $text);
     ?>
     <div class="steam-comment">
         <div class="avatar">
