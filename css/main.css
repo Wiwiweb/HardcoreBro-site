@@ -90,3 +90,50 @@ div.footer {
 #options a {
     color: grey;
 }
+
+#links {
+    width: 800px;
+    float: left;
+    border: 1px solid #ffffff;
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 9px;
+    padding-bottom: 9px;
+}
+
+#steam-comments-container {
+    width: 800px;
+    float: right;
+}
+
+#steam-comments {
+    border: 1px solid #ffffff;
+    padding: 2px;
+}
+
+#steam-comments .steam-comment {
+    padding: 2px;
+}
+
+#steam-comments hr {
+    margin: auto;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+#steam-comments .avatar {
+    float: left;
+}
+
+#steam-comments img {
+    position: relative;
+    top: 2px;
+}
+
+#steam-comments .name {
+    font-weight:bold;
+}
+
+#steam-comments .steam-comment-body {
+    margin-left: 45px;
+}

@@ -1,5 +1,12 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<?php
+
+$mysqli = mysqli_connect() or die("Connect failed: " . mysqli_connect_error());
+$mysqli->select_db('hardcore_bro');
+
+?>
 
 <html>
 
@@ -50,12 +57,57 @@
     <table width="100%">
         <tr>
             <td><a href="http://steamcommunity.com/groups/vohcb"><img
-                    alt="Steam Group" src="images/steam.jpg"/></a></td>
+                        alt="Steam Group" src="images/steam.jpg"/></a></td>
             <td><a href="../board"><img alt="Imageboard"
                                         src="images/imageboard.jpg"/></a></td>
         </tr>
     </table>
 </div>
+
+<div id="steam-comments-container">
+    <strong><a href="http://steamcommunity.com/groups/vohcb#comments">Steam comments:</a></strong>
+
+    <div id="steam-comments">
+        <?
+        $query = "SELECT * FROM steam_comments ORDER BY id DESC LIMIT 3";
+        $result = $mysqli->query($query) or die($mysqli->error . __LINE__);
+        for ($rowNo = $result->num_rows - 1; $rowNo >= 0; $rowNo--) {
+            $result->data_seek($rowNo);
+            $row = $result->fetch_assoc();
+            createSteamComment($row);
+            if ($rowNo < $result->num_rows - 1) {
+                printf('<hr>');
+            }
+        }
+        ?>
+    </div>
+</div>
 </body>
 
 </html>
+
+
+<?php
+
+function createSteamComment($row)
+{
+    $author = strip_tags($row['author']);
+    $avatar = $row['avatar'];
+    $date = $row['date'];
+    $text = strip_tags($row['text']);
+    $emoticonPattern = '/:(\w+):/';
+    $replacementPattern = "<img src=\"http://cdn.steamcommunity.com/economy/emoticon/$1\">";
+    $text = preg_replace($emoticonPattern, $replacementPattern, $text);
+    ?>
+    <div class="steam-comment">
+        <div class="avatar">
+            <img src="<? echo $avatar; ?>">
+        </div>
+        <div class="steam-comment-body">
+            <div class="author"><span class="name"><? echo $author; ?></span> - <? echo $date; ?></div>
+            <div class="text"><? echo $text; ?></div>
+        </div>
+    </div>
+<?
+}
+?>
