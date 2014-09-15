@@ -69,9 +69,9 @@ $mysqli->select_db('hardcore_bro');
 
     <div id="steam-comments">
         <?
-        $query = "SELECT * FROM steam_comments ORDER BY id DESC LIMIT 3";
+        $query = "SELECT * FROM steam_comments ORDER BY id ASC LIMIT 3";
         $result = $mysqli->query($query) or die($mysqli->error . __LINE__);
-        for ($rowNo = $result->num_rows - 1; $rowNo >= 0; $rowNo--) {
+        for ($rowNo = 0; $rowNo < $result->num_rows; $rowNo++) {
             $result->data_seek($rowNo);
             $row = $result->fetch_assoc();
             createSteamComment($row);
@@ -93,7 +93,11 @@ function createSteamComment($row)
 {
     $author = strip_tags($row['author']);
     $avatar = $row['avatar'];
-    $date = $row['date'];
+
+    $date = strtotime($row['date']);
+    $date = date('j M @ G:i', $date);
+    #8 Jun @ 6:52
+
     $text = strip_tags($row['text']);
     $emoticonPattern = '/:(\w+):/';
     $replacementPattern = "<img src=\"http://cdn.steamcommunity.com/economy/emoticon/$1\">";
@@ -110,4 +114,5 @@ function createSteamComment($row)
     </div>
 <?
 }
+
 ?>
