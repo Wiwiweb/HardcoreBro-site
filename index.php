@@ -69,7 +69,7 @@ $mysqli->select_db('hardcore_bro');
 
     <div id="steam-comments">
         <?
-        $query = "SELECT * FROM steam_comments ORDER BY id ASC LIMIT 3";
+        $query = "SELECT * FROM steam_comments ORDER BY date DESC LIMIT 3";
         $result = $mysqli->query($query) or die($mysqli->error . __LINE__);
         for ($rowNo = 0; $rowNo < $result->num_rows; $rowNo++) {
             $result->data_seek($rowNo);
