@@ -59,8 +59,8 @@ $mysqli->select_db('hardcore_bro');
     <div class="buttons col-md-4 vertical-align text-center">
         <a href="http://steamcommunity.com/groups/vohcb"><img alt="Steam Group" src="images/steam.jpg"/></a>
         <a href="../board"><img alt="Imageboard" src="images/imageboard.jpg"/></a>
-    </div><!--
- --><div class="col-md-8 vertical-align">
+    </div>
+    <div class="col-md-7 vertical-align">
         <strong><a href="http://steamcommunity.com/groups/vohcb#comments">Steam comments:</a></strong>
 
         <div id="steam-comments">
@@ -101,7 +101,7 @@ function createSteamComment($row)
     $text = preg_replace($linkPattern, $linkReplace, $text);
 
     $emoticonPattern = '/:(\w+):/';
-    $emoticonReplace = '<img src="http://cdn.steamcommunity.com/economy/emoticon/$1">';
+    $emoticonReplace = '<img src="http://cdn.steamcommunity.com/economy/emoticon/$1" onerror="brokenSteamEmoticon(this);">';
     $text = preg_replace($emoticonPattern, $emoticonReplace, $text);
     ?>
     <div class="steam-comment">

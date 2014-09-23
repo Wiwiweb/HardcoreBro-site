@@ -4,13 +4,9 @@ var $chat;
 var $ratioChangeButton;
 
 var isRatio169 = true;
-var playerWidthPercent = .69;
-var chatWidthPercent = .29;
 var ratio = 16 / 9;
 
 var PLAYER_BAR_SIZE = 30;
-var TWITCH_CHAT_MIN_WIDTH = 300;
-var PLAYER_CHAT_SPACER = 15;
 
 $(document).ready(function () {
     $mainContainer = $('#main-container');
@@ -85,4 +81,17 @@ function popoutStream() {
 
 function popoutChat() {
     window.open("http://www.twitch.tv/chat/embed?channel=hardcore_bro&popout_chat=true", "HCB Chat", "height=800, width=400");
+}
+
+function brokenSteamEmoticon(image) {
+    if($(image).is(":visible")) {
+        var src = $(image).attr('src');
+        console.log(src);
+        var split = src.split('/');
+        console.log(split);
+        var text = ':' + split[split.length -1] + ':';
+        console.log(text);
+        $(image).after(text);
+        $(image).hide();
+    }
 }
