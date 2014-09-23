@@ -84,14 +84,10 @@ function popoutChat() {
 }
 
 function brokenSteamEmoticon(image) {
-    if($(image).is(":visible")) {
-        var src = $(image).attr('src');
-        console.log(src);
-        var split = src.split('/');
-        console.log(split);
-        var text = ':' + split[split.length -1] + ':';
-        console.log(text);
-        $(image).after(text);
-        $(image).hide();
-    }
+    $(image).removeAttr('onerror');
+    var src = $(image).attr('src');
+    var split = src.split('/');
+    var text = ':' + split[split.length -1] + ':';
+    $(image).after(text);
+    $(image).hide();
 }
