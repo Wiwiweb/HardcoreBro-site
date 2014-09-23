@@ -16,8 +16,8 @@ $mysqli->select_db('hardcore_bro');
           content="Streaming video games with a funny accent.">
     <meta name="keywords"
           content="video game live stream streaming feed hardcore bro">
-    <link rel="stylesheet" media="screen" type="text/css" title="Main"
-          href="css/main.css"/>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="css/main.css"/>
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <script type="text/javascript"
             src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
@@ -25,6 +25,8 @@ $mysqli->select_db('hardcore_bro');
             src="//cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.3.1/jquery.cookie.min.js"></script>
     <script type="text/javascript"
             src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+    <script type="text/javascript"
+            src="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.2.0/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="scripts/main.js"></script>
     <script type="text/javascript" src="scripts/url-parameters.js"></script>
 </head>
@@ -53,33 +55,28 @@ $mysqli->select_db('hardcore_bro');
     <b><a href="javascript:popoutChat()">Popout chat</a></b>
 </div>
 
-<div class="box" style="width: 800px">
-    <table width="100%">
-        <tr>
-            <td><a href="http://steamcommunity.com/groups/vohcb"><img
-                        alt="Steam Group" src="images/steam.jpg"/></a></td>
-            <td><a href="../board"><img alt="Imageboard"
-                                        src="images/imageboard.jpg"/></a></td>
-        </tr>
-    </table>
-</div>
+<div class="bottom">
+    <div class="buttons col-md-4 vertical-align text-center">
+        <a href="http://steamcommunity.com/groups/vohcb"><img alt="Steam Group" src="images/steam.jpg"/></a>
+        <a href="../board"><img alt="Imageboard" src="images/imageboard.jpg"/></a>
+    </div><!--
+ --><div class="col-md-8 vertical-align">
+        <strong><a href="http://steamcommunity.com/groups/vohcb#comments">Steam comments:</a></strong>
 
-<div id="steam-comments-container">
-    <strong><a href="http://steamcommunity.com/groups/vohcb#comments">Steam comments:</a></strong>
-
-    <div id="steam-comments">
-        <?
-        $query = "SELECT * FROM steam_comments ORDER BY date DESC LIMIT 3";
-        $result = $mysqli->query($query) or die($mysqli->error . __LINE__);
-        for ($rowNo = 0; $rowNo < $result->num_rows; $rowNo++) {
-            $result->data_seek($rowNo);
-            $row = $result->fetch_assoc();
-            createSteamComment($row);
-            if ($rowNo < $result->num_rows - 1) {
-                printf('<hr>');
+        <div id="steam-comments">
+            <?
+            $query = "SELECT * FROM steam_comments ORDER BY date DESC LIMIT 3";
+            $result = $mysqli->query($query) or die($mysqli->error . __LINE__);
+            for ($rowNo = 0; $rowNo < $result->num_rows; $rowNo++) {
+                $result->data_seek($rowNo);
+                $row = $result->fetch_assoc();
+                createSteamComment($row);
+                if ($rowNo < $result->num_rows - 1) {
+                    printf('<hr>');
+                }
             }
-        }
-        ?>
+            ?>
+        </div>
     </div>
 </div>
 </body>
